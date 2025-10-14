@@ -1,0 +1,31 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  scheduling: one
+  motorcycle: one
+  mechanic: one
+  start_date: 2025-10-14 17:45:59
+  completion_date: 2025-10-14 17:45:59
+  km_review: 1
+  type: 
+  status: MyString
+  labor_value: 9.99
+  total_value: 9.99
+  mechanic_observations: MyText
+  internal_observations: MyText
+  report: MyText
+
+two:
+  scheduling: two
+  motorcycle: two
+  mechanic: two
+  start_date: 2025-10-14 17:45:59
+  completion_date: 2025-10-14 17:45:59
+  km_review: 1
+  type: 
+  status: MyString
+  labor_value: 9.99
+  total_value: 9.99
+  mechanic_observations: MyText
+  internal_observations: MyText
+  report: MyText

@@ -1,0 +1,19 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  name: MyString
+  displacement: 1
+  start_production_year: 1
+  end_production_year: 1
+  description: MyText
+  warranty_months: 1
+  warranty_km: 1
+
+two:
+  name: MyString
+  displacement: 1
+  start_production_year: 1
+  end_production_year: 1
+  description: MyText
+  warranty_months: 1
+  warranty_km: 1
