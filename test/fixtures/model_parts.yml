@@ -1,0 +1,13 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  model_motorcycle: one
+  part: one
+  mandatory_review: false
+  km_replacement: 1
+
+two:
+  model_motorcycle: two
+  part: two
+  mandatory_review: false
+  km_replacement: 1
