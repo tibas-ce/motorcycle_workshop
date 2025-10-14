@@ -1,0 +1,19 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  motorcycle: one
+  user: one
+  scheduled_time_date: 2025-10-14 16:44:03
+  type: 
+  current_scheduling_km: 1
+  client_observations: MyText
+  status: MyString
+
+two:
+  motorcycle: two
+  user: two
+  scheduled_time_date: 2025-10-14 16:44:03
+  type: 
+  current_scheduling_km: 1
+  client_observations: MyText
+  status: MyString

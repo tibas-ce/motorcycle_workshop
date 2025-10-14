@@ -14,7 +14,7 @@ class CreateMotorcycles < ActiveRecord::Migration[8.0]
       t.timestamps
     end
 
-    add_index :motos, :placa, unique: true
-    add_index :motos, :chassi, unique: true
+    add_index :motorcycles, :license_plate, unique: true
+    add_index :motorcycles, :chassis, unique: true
   end
 end
