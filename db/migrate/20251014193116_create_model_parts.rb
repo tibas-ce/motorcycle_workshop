@@ -9,6 +9,6 @@ class CreateModelParts < ActiveRecord::Migration[8.0]
       t.timestamps
     end
 
-    add_index :modelo_pecas, [ :modelo_moto_id, :peca_id ], unique: true
+    add_index :model_parts, [ :model_motorcycle_id, :part_id ], unique: true
   end
 end
