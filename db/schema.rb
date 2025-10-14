@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_10_01_094516) do
+ActiveRecord::Schema[8.0].define(version: 2025_10_14_164128) do
   create_table "mechanics", force: :cascade do |t|
     t.integer "user_id", null: false
     t.string "professional_registration"
@@ -19,6 +19,19 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_01_094516) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["user_id"], name: "index_mechanics_on_user_id"
+  end
+
+  create_table "motorcycle_models", force: :cascade do |t|
+    t.string "name", null: false
+    t.integer "displacement", null: false
+    t.integer "start_production_year"
+    t.integer "end_production_year"
+    t.text "description"
+    t.integer "warranty_months", default: 36
+    t.integer "warranty_km", default: 30000
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["name"], name: "index_motorcycle_models_on_name"
   end
 
   create_table "users", force: :cascade do |t|
@@ -38,5 +51,5 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_01_094516) do
     t.index ["role"], name: "index_users_on_role"
   end
 
-  add_foreign_key "mechanics", "users"
+  add_foreign_key "mechanics", "motorcycle_models", "users"
 end
