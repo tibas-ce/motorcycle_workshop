@@ -7,7 +7,7 @@ class CreateReviews < ActiveRecord::Migration[8.0]
       t.datetime :start_date, null: false
       t.datetime :completion_date
       t.integer :km_review, null: false
-      t.string :type, null: false # "garantia" ou "normal"
+      t.string :service_type, null: false # "garantia" ou "normal"
       t.string :status, default: "em_andamento" # "em_andamento", "concluida", "aguardando_peca"
       t.decimal :labor_value, precision: 10, scale: 2, default: 0
       t.decimal :total_value, precision: 10, scale: 2, default: 0
@@ -19,7 +19,7 @@ class CreateReviews < ActiveRecord::Migration[8.0]
     end
 
     add_index :reviews, :status
-    add_index :reviews, :type
+    add_index :reviews, :service_type
     add_index :reviews, :start_date
   end
 end

@@ -33,6 +33,18 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_14_205110) do
     t.index ["part_id"], name: "index_model_parts_on_part_id"
   end
 
+  create_table "modelo_motos", force: :cascade do |t|
+    t.string "nome"
+    t.integer "cilindrada"
+    t.integer "ano_inicio_fabricacao"
+    t.integer "ano_fim_fabricacao"
+    t.text "descricao"
+    t.integer "meses_garantia"
+    t.integer "km_garantia"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "motorcycle_models", force: :cascade do |t|
     t.string "name", null: false
     t.integer "displacement", null: false
