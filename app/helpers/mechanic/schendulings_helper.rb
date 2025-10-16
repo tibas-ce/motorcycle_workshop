@@ -1,0 +1,2 @@
+module Mechanic::SchendulingsHelper
+end

@@ -1,0 +1,2 @@
+module Mechanic::DashboardHelper
+end
