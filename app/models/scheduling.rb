@@ -13,7 +13,7 @@ class Scheduling < ApplicationRecord
   has_one :review, dependent: :nullify
 
   # Validações de presença: garantem que o agendamento tenha data/hora, tipo e status definidos.
-  validates :scheduled_time_date, :type, :status, presence: true
+  validates :scheduled_time_date, :service_type, :status, presence: true
   # Validação: restringe o tipo de serviço aos valores definidos.
   # "garantia" → revisão coberta pela garantia da moto
   # "normal" → revisão comum
