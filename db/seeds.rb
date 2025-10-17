@@ -204,26 +204,120 @@ spark_plug = Part.create!(
 puts "Vinculando peças aos modelos..."
 
 # Meteor 350
-ModelPart.create!(motorcycle_model: meteor, part: oil_engine, obrigatoria_revisao: true, km_troca: 5000)
-ModelPart.create!(motorcycle_model: meteor, part: filter_oil, obrigatoria_revisao: true, km_troca: 5000)
-ModelPart.create!(motorcycle_model: meteor, part: chain, obrigatoria_revisao: false, km_troca: 10000)
-ModelPart.create!(motorcycle_model: meteor, part: crown, obrigatoria_revisao: false, km_troca: 20000)
-ModelPart.create!(motorcycle_model: meteor, part: sprocket, obrigatoria_revisao: false, km_troca: 20000)
-ModelPart.create!(motorcycle_model: meteor, part: brake_pad, obrigatoria_revisao: false, km_troca: 15000)
-ModelPart.create!(motorcycle_model: meteor, part: brake_disc, obrigatoria_revisao: false, km_troca: 30000)
-ModelPart.create!(motorcycle_model: meteor, part: spark_plug, obrigatoria_revisao: false, km_troca: 10000)
+ModelPart.create!(motorcycle_model: meteor, part: oil_engine, obrigatoria_revisao: true, km_replacement: 5000)
+ModelPart.create!(motorcycle_model: meteor, part: filter_oil, obrigatoria_revisao: true, km_replacement: 5000)
+ModelPart.create!(motorcycle_model: meteor, part: chain, obrigatoria_revisao: false, km_replacement: 10000)
+ModelPart.create!(motorcycle_model: meteor, part: crown, obrigatoria_revisao: false, km_replacement: 20000)
+ModelPart.create!(motorcycle_model: meteor, part: sprocket, obrigatoria_revisao: false, km_replacement: 20000)
+ModelPart.create!(motorcycle_model: meteor, part: brake_pad, obrigatoria_revisao: false, km_replacement: 15000)
+ModelPart.create!(motorcycle_model: meteor, part: brake_disc, obrigatoria_revisao: false, km_replacement: 30000)
+ModelPart.create!(motorcycle_model: meteor, part: spark_plug, obrigatoria_revisao: false, km_replacement: 10000)
 
 # Himalayan 450
-ModelPart.create!(motorcycle_model: himalayan, part: oil_engine, obrigatoria_revisao: true, km_troca: 5000)
-ModelPart.create!(motorcycle_model: himalayan, part: filter_oil, obrigatoria_revisao: true, km_troca: 5000)
-ModelPart.create!(motorcycle_model: himalayan, part: chain, obrigatoria_revisao: false, km_troca: 10000)
-ModelPart.create!(motorcycle_model: himalayan, part: brake_pad, obrigatoria_revisao: false, km_troca: 15000)
-ModelPart.create!(motorcycle_model: himalayan, part: battery, obrigatoria_revisao: false, km_troca: 60000)
-ModelPart.create!(motorcycle_model: himalayan, part: spark_plug, obrigatoria_revisao: false, km_troca: 10000)
+ModelPart.create!(motorcycle_model: himalayan, part: oil_engine, obrigatoria_revisao: true, km_replacement: 5000)
+ModelPart.create!(motorcycle_model: himalayan, part: filter_oil, obrigatoria_revisao: true, km_replacement: 5000)
+ModelPart.create!(motorcycle_model: himalayan, part: chain, obrigatoria_revisao: false, km_replacement: 10000)
+ModelPart.create!(motorcycle_model: himalayan, part: brake_pad, obrigatoria_revisao: false, km_replacement: 15000)
+ModelPart.create!(motorcycle_model: himalayan, part: battery, obrigatoria_revisao: false, km_replacement: 60000)
+ModelPart.create!(motorcycle_model: himalayan, part: spark_plug, obrigatoria_revisao: false, km_replacement: 10000)
 
 # Interceptor 650
-ModelPart.create!(motorcycle_model: interceptor, part: oil_650, obrigatoria_revisao: true, km_troca: 6000)
-ModelPart.create!(motorcycle_model: interceptor, part: filter_oil, obrigatoria_revisao: true, km_troca: 6000)
-ModelPart.create!(motorcycle_model: interceptor, part: chain, obrigatoria_revisao: false, km_troca: 12000)
-ModelPart.create!(motorcycle_model: interceptor, part: brake_disc, obrigatoria_revisao: false, km_troca: 30000)
-ModelPart.create!(motorcycle_model: interceptor, part: battery, obrigatoria_revisao: false, km_troca: 60000)
+ModelPart.create!(motorcycle_model: interceptor, part: oil_650, obrigatoria_revisao: true, km_replacement: 6000)
+ModelPart.create!(motorcycle_model: interceptor, part: filter_oil, obrigatoria_revisao: true, km_replacement: 6000)
+ModelPart.create!(motorcycle_model: interceptor, part: chain, obrigatoria_revisao: false, km_replacement: 12000)
+ModelPart.create!(motorcycle_model: interceptor, part: brake_disc, obrigatoria_revisao: false, km_replacement: 30000)
+ModelPart.create!(motorcycle_model: interceptor, part: battery, obrigatoria_revisao: false, km_replacement: 60000)
+
+puts "Criando motos dos clientes..."
+
+# Motos do João
+moto1 = Moto.create!(
+  user: cliente1,
+  motorcycle_model: meteor,
+  license_plate: 'ABC-1234',
+  chassis: 'RM12345678ABC001',
+  year_of_manufacture: 2023,
+  color: 'Preta',
+  current_km: 3500,
+  purchase_date: 8.months.ago.to_date,
+  invoice_number: 'NF-2023-0001'
+)
+
+# Moto da Maria
+moto2 = Moto.create!(
+  user: cliente2,
+  motorcycle_model: himalayan,
+  license_plate: 'XYZ-5678',
+  chassis: 'RM87654321XYZ002',
+  year_of_manufacture: 2024,
+  color: 'Branca',
+  current_km: 1200,
+  purchase_date: 2.months.ago.to_date,
+  invoice_number: 'NF-2024-0001'
+)
+
+puts "Criando agendamentos..."
+
+# Agendamento de João (em garantia)
+agendamento1 = Agendamento.create!(
+  motorcycle: moto1,
+  user: cliente1,
+  scheduled_time_date: 5.days.from_now,
+  service_type: 'garantia',
+  current_scheduling_km: 3500,
+  client_observations: 'Primeira revisão, fazer verificação geral',
+  status: 'confirmado'
+)
+
+# Agendamento de Maria (em garantia)
+agendamento2 = Agendamento.create!(
+  motorcycle: moto2,
+  user: cliente2,
+  scheduled_time_date: 10.days.from_now,
+  service_type: 'garantia',
+  current_scheduling_km: 1200,
+  client_observations: 'Revisão de 1000 km',
+  status: 'pendente'
+)
+
+puts "Criando revisões..."
+
+# Revisão concluída
+revisao1 = Revisao.create!(
+  scheduling: agendamento1,
+  motorcycle: moto1,
+  mechanic: mecanico1,
+  start_date: 10.days.ago,
+  completion_date: 10.days.ago + 2.hours,
+  km_review: 3200,
+  service_type: 'garantia',
+  status: 'concluida',
+  labor_value: 0,
+  mechanic_observations: 'Revisão realizada com sucesso!'
+)
+
+# Adicionar peças à revisão 1
+ReviewPart.create!(
+  review: revisao1,
+  part: oil_engine,
+  quantity: 2,
+  unit_price: 0,
+  guarantee: true
+)
+
+ReviewPart.create!(
+  review: revisao1,
+  part: filter_oil,
+  quantity: 1,
+  unit_price: 0,
+  guarantee: true
+)
+
+puts "✅ Seeds criados com sucesso!"
+puts ""
+puts "Dados de acesso:"
+puts "Admin: admin@royalenfield.com / password123"
+puts "Mecânico 1: carlos@royalenfield.com / password123"
+puts "Mecânico 2: jose@royalenfield.com / password123"
+puts "Cliente 1: joao@email.com / password123"
+puts "Cliente 2: maria@email.com / password123"
