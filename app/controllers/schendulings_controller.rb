@@ -25,7 +25,7 @@ class SchedulingsController < ApplicationController
   # Exibe o formulário para criar um novo agendamento vinculado a uma motocicleta específica.
   def new
     @motorcycle = current_user.motorcycles.find(params[:motorcycle_id])
-    @scheduling = @motorcycle.shendulings.build
+    @scheduling = @motorcycle.scheduling.build
     @service_type = @motorcycle.allowed_revision_types
   end
 
@@ -34,7 +34,7 @@ class SchedulingsController < ApplicationController
   # Associa automaticamente o agendamento ao usuário atual.
   def create
     @motorcycle = current_user.motorcycles.find(params[:scheduling][:motorcycle_id])
-    @scheduling = @motorcycle.shendulings.build(shenduling_params)
+    @scheduling = @motorcycle.schedulings.build(scheduling_params)
     @scheduling.user = current_user
 
     if @scheduling.save
@@ -50,14 +50,14 @@ class SchedulingsController < ApplicationController
   def destroy
     authorize_user!(@scheduling.user)
     @scheduling.update(status: "cancelado")
-    redirect_to shendulings_url, notice: "Agendamento cancelado."
+    redirect_to schedulings_url, notice: "Agendamento cancelado."
   end
 
   private
 
   # Localiza o agendamento com base no ID informado na URL.
   def set_scheduling
-    @agendamento = Scheduling.find(params[:id])
+    @scheduling = Scheduling.find(params[:id])
   end
 
   # Define os parâmetros permitidos para criação/edição de agendamentos.
