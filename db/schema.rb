@@ -13,11 +13,12 @@
 ActiveRecord::Schema[8.0].define(version: 2025_10_14_205110) do
   create_table "mechanics", force: :cascade do |t|
     t.integer "user_id", null: false
-    t.string "professional_registration"
+    t.string "professional_registration", null: false
     t.string "specialty"
-    t.boolean "asset"
+    t.boolean "asset", default: true
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["professional_registration"], name: "index_mechanics_on_professional_registration", unique: true
     t.index ["user_id"], name: "index_mechanics_on_user_id"
   end
 
@@ -31,18 +32,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_14_205110) do
     t.index ["model_motorcycle_id", "part_id"], name: "index_model_parts_on_model_motorcycle_id_and_part_id", unique: true
     t.index ["model_motorcycle_id"], name: "index_model_parts_on_model_motorcycle_id"
     t.index ["part_id"], name: "index_model_parts_on_part_id"
-  end
-
-  create_table "modelo_motos", force: :cascade do |t|
-    t.string "nome"
-    t.integer "cilindrada"
-    t.integer "ano_inicio_fabricacao"
-    t.integer "ano_fim_fabricacao"
-    t.text "descricao"
-    t.integer "meses_garantia"
-    t.integer "km_garantia"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
   end
 
   create_table "motorcycle_models", force: :cascade do |t|
@@ -109,7 +98,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_14_205110) do
     t.datetime "start_date", null: false
     t.datetime "completion_date"
     t.integer "km_review", null: false
-    t.string "type", null: false
+    t.string "service_type", null: false
     t.string "status", default: "em_andamento"
     t.decimal "labor_value", precision: 10, scale: 2, default: "0.0"
     t.decimal "total_value", precision: 10, scale: 2, default: "0.0"
@@ -121,16 +110,16 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_14_205110) do
     t.index ["mechanic_id"], name: "index_reviews_on_mechanic_id"
     t.index ["motorcycle_id"], name: "index_reviews_on_motorcycle_id"
     t.index ["scheduling_id"], name: "index_reviews_on_scheduling_id"
+    t.index ["service_type"], name: "index_reviews_on_service_type"
     t.index ["start_date"], name: "index_reviews_on_start_date"
     t.index ["status"], name: "index_reviews_on_status"
-    t.index ["type"], name: "index_reviews_on_type"
   end
 
   create_table "schedulings", force: :cascade do |t|
     t.integer "motorcycle_id", null: false
     t.integer "user_id", null: false
     t.datetime "scheduled_time_date", null: false
-    t.string "type", null: false
+    t.string "service_type", null: false
     t.integer "current_scheduling_km"
     t.text "client_observations", default: "pendente"
     t.string "status"
@@ -138,8 +127,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_14_205110) do
     t.datetime "updated_at", null: false
     t.index ["motorcycle_id"], name: "index_schedulings_on_motorcycle_id"
     t.index ["scheduled_time_date"], name: "index_schedulings_on_scheduled_time_date"
+    t.index ["service_type"], name: "index_schedulings_on_service_type"
     t.index ["status"], name: "index_schedulings_on_status"
-    t.index ["type"], name: "index_schedulings_on_type"
     t.index ["user_id"], name: "index_schedulings_on_user_id"
   end
 
