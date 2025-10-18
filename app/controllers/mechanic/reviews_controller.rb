@@ -3,7 +3,7 @@
 # Permite listar, criar, visualizar, editar e finalizar revisões associadas a agendamentos.
 class Mechanic::ReviewsController < ApplicationController
   # Localiza a revisão antes das ações que precisam de um registro carregado.
-  before_action :set_revisao, only: [ :show, :edit, :update, :finish ]
+  before_action :set_review, only: [ :show, :edit, :update, :finish ]
 
   # GET /mechanic/reviews
   # Lista as revisões do mecânico logado.
