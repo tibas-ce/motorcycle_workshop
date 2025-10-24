@@ -32,7 +32,7 @@ class MotorcyclesController < ApplicationController
   # POST /motorcycles
   # Cria uma nova moto associada ao usuário logado.
   def create
-    @motorcycle = current_user.motorcycle.build(motorcycle_params)
+    @motorcycle = current_user.motorcycles.build(motorcycle_params)
 
     if @motorcycle.save
       redirect_to @motorcycle, notice: "Moto cadastrada com sucesso!"
@@ -51,7 +51,7 @@ class MotorcyclesController < ApplicationController
   # PATCH/PUT /motorcycles/:id
   # Atualiza as informações de uma moto existente.
   def update
-    if @motorcycle.update(moto_params)
+    if @motorcycle.update(motorcycle_params)
       redirect_to @motorcycle, notice: "Moto atualizada com sucesso!"
     else
       @motorcycle_models = MotorcycleModel.all
