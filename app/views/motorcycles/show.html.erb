@@ -1,2 +1,40 @@
-<h1>Motorcycles#show</h1>
-<p>Find me in app/views/motorcycles/show.html.erb</p>
+<div class="row">
+    <div class="col-md-8">
+        <h1><%= @moto.motorcycle_model.name %></h1>
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5>Informações da Moto</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>Placa:</strong> <%= @moto.license_plate %></p>
+                        <p><strong>Chassi:</strong> <%= @moto.chassis %></p>
+                        <p><strong>Ano:</strong> <%= @moto.year_of_manufacture %></p>
+                        <p><strong>Cor:</strong> <%= @moto.color %></p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>KM Atual:</strong><%= number_with_delimiter(@moto.current_km) %></p>
+                        <p><strong>Data da Compra:</strong><%= l(@moto.purchase_date, formt: :long) %></p>
+                        <p><strong>Nota Fiscal:</strong><%= @moto.invoice_number %></p>
+                        <p>
+                            <strong>Status da Garantia</strong>
+                            <% if @moto.em_garantia? %>
+                                <span class="badge bg-success">Em Garantia</span><br>
+                                <small class="text-muted"><%= @moto.info_guarantee %></small>
+                            <% else %>
+                                <span class="badge bg-secondary">Fora da Garantia</span>
+                            <% end %>
+                        </p>                        
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <%= link_to "Editar Moto", edit_moto_path(@moto), class: "btn btn-warning" %>
+                    <%= link_to "Agendar Revisão", new_moto_agendamento_path(@moto), class: "btn btn-success" %>
+                    <%= link_to "Voltar", motorcycles_path, class: "btn btn-secondary" %>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
