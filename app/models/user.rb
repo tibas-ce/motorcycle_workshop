@@ -13,11 +13,11 @@ class User < ApplicationRecord
   # Relacionamentos Active Record:
   # Um usuário pode ter várias motos e agendamentos (quando ele é cliente, por exemplo).
   # Se o usuário for deletado, suas motos e agendamentos também são apagados.
-  has_many motorcycle, dependent: :destroy
-  has_many scheduling, dependent: :destroy
+  has_many :motorcycle, dependent: :destroy
+  has_many :scheduling, dependent: :destroy
   # Um usuário pode ter um mecânico associado (caso seja um usuário do tipo "mecânico").
   # O registro do mecânico é excluído se o usuário for removido.
-  has_one mechanic, dependent: :destroy
+  has_one :mechanic, dependent: :destroy
 
   # Validações de presença — exige que o nome e o papel (role) sejam informados.
   validates :name, :role, presence: true
