@@ -1,2 +1,51 @@
-<h1>Motorcycles#index</h1>
-<p>Find me in app/views/motorcycles/index.html.erb</p>
+<!-- Seção de título e cadastro nova moto -->
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Minhas Motos</h1>
+    <%= link_to "Cadastrar nova Moto", new_motorcycle_path, class: "btn btn-primary" %>
+</div>
+
+<!-- Verifica se o usuário possui motos cadastradas -->
+<% if @motorcycles.any? %>
+    <div class="row">
+        <%# Percorre todas as motos do usuário %>
+        <% @motorcycles.each do |moto| %>
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <!-- Nome do modelo da moto -->
+                    <h5 class="card-title"><%= moto.motorcycle_model.name %></h5>
+                    <!-- Informações detalhadas da moto -->
+                    <p class="card-text">
+                    <strong>Placa:</strong> <%= moto.license_plate %><br>
+                    <strong>Ano:</strong> <%= moto.year_of_manufacture %><br>
+                    <strong>Cor:</strong> <%= moto.color %><br>
+                    <strong>KM Atual:</strong> <%= number_with_delimiter(moto.current_km) %> km<br>
+                    <!-- Exibe o status da garantia -->
+                    <strong>Garantia:</strong> 
+                    <% if moto.em_garantia? %>
+                        <span class="badge bg-success">Em Garantia</span><br>
+                        <small class="text-muted"><%= moto.info_guarantee %></small>
+                    <% else %>
+                        <span class="badge bg-secondary">Fora da garantia!</span>
+                    <% end %>
+                    </p>
+                    <!-- Botões de ação para cada moto -->
+                    <div class="d-flex gap-2">
+                    <%= link_to "Ver Detalhes", moto, class: "btn btn-sm btn-info" %>
+                    <%= link_to "Agendar Revisão", new_motorcycle_schenduling_path(moto), class: "btn btn-sm btn-success" %>
+                    <%= link_to "Editar", edit_motorcycle_path(moto), class: "btn btn-sm btn-warning" %>
+                    <%= button_to "Excluir", moto, method: :delete, 
+                        data: { confirm: "Tem certeza?" }, 
+                        class: "btn btn-sm btn-danger" %>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <% end %>
+    </div>
+<% else %>
+    <!-- Caso o usuário ainda não tenha motos cadastradas -->
+    <div class="alert alert-info">
+        <p class="mb-0">Você ainda não cadastrou nenhuma moto.<%= link_to "Cadastre sua primeira moto", new_motorcycle_path %></p>
+    </div>
+<% end %>
