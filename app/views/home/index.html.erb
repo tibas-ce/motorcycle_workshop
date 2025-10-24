@@ -1,2 +1,69 @@
-<h1>Home#index</h1>
-<p>Find me in app/views/home/index.html.erb</p>
+<%# == View: home/index.html.erb
+    Página inicial da aplicação "Oficina Royal Enfield"
+    Esta view serve como a tela de boas-vindas e ponto de entrada para os diferentes tipos de usuários:
+    - Clientes → podem cadastrar motos e agendar revisões.
+    - Mecânicos → acessam o painel técnico e revisões em andamento.
+    - Administradores → gerenciam modelos, peças e usuários.
+
+    A estrutura usa classes do Bootstrap (como `jumbotron`, `card`, `row`, `col-md-*`)
+    para criar uma interface limpa e responsiva.
+%>
+
+<div class="jumbotron bg-light p-5 rounded">
+    <%# Cabeçalho principal da página. %>
+  <h1 class="display-4">Bem-vindo à Oficina Royal Enfield</h1>
+  <p class="lead">Especializada em manutenção e revisão de motocicletas Royal Enfield</p>
+  <hr class="my-4">
+  
+  <%# Bloco condicional: conteúdo exibido varia conforme o estado de autenticação do usuário %>
+  <% if user_signed_in? %>
+    <p>Olá, <%= current_user.name %>!</p>
+    
+    <%# Exibição de botões específicos para cada tipo de usuário %>
+    <% if current_user.cliente? %>
+    <%# Clientes podem visualizar suas motos e agendar revisões %>
+      <%= link_to "Ver Minhas Motos", motorcycles_path, class: "btn btn-primary btn-lg" %>
+      <%= link_to "Agendar Revisão", schedulings_path, class: "btn btn-success btn-lg" %>
+    <% elsif current_user.admin? %>
+    <%# Administradores têm acesso ao painel administrativo %>
+      <%= link_to "Ir para Dashboard Admin", admin_dashboard_path, class: "btn btn-primary btn-lg" %>
+    <% elsif current_user.mecanico? %>
+    <%# Mecânicos acessam o painel técnico para gerenciar revisões %>
+      <%= link_to "Ir para Dashboard Mecânico", mechanics_dashboard_path, class: "btn btn-primary btn-lg" %>
+    <% end %>
+  <% else %>
+    <p>Faça login para gerenciar suas motos e agendamentos</p>
+    <%= link_to "Entrar", new_user_session_path, class: "btn btn-primary btn-lg" %>
+    <%= link_to "Cadastrar", new_user_registration_path, class: "btn btn-outline-primary btn-lg" %>
+  <% end %>
+</div>
+
+<%# Seção informativa com três colunas, cada uma destacando um serviço principal %>
+<div class="row mt-5">
+  <div class="col-md-4">
+    <div class="card">
+      <div class="card-body text-center">
+        <h3>🏍️ Motos</h3>
+        <p>Cadastre e gerencie suas Royal Enfield</p>
+      </div>
+    </div>
+  </div>
+  
+  <div class="col-md-4">
+    <div class="card">
+      <div class="card-body text-center">
+        <h3>📅 Agendamentos</h3>
+        <p>Agende revisões de garantia ou normais</p>
+      </div>
+    </div>
+  </div>
+  
+  <div class="col-md-4">
+    <div class="card">
+      <div class="card-body text-center">
+        <h3>🔧 Mecânicos</h3>
+        <p>Equipe especializada em Royal Enfield</p>
+      </div>
+    </div>
+  </div>
+</div>
