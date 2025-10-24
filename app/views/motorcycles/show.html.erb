@@ -1,2 +1,177 @@
-<h1>Motorcycles#show</h1>
-<p>Find me in app/views/motorcycles/show.html.erb</p>
+<!-- Página de detalhes de uma moto específica -->
+<div class="row">
+    <div class="col-md-8">
+        <%# Exibe o nome do modelo da moto %>
+        <h1><%= @moto.motorcycle_model.name %></h1>
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5>Informações da Moto</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <!-- Coluna esquerda: dados básicos -->
+                    <div class="col-md-6">
+                        <p><strong>Placa:</strong> <%= @moto.license_plate %></p>
+                        <p><strong>Chassi:</strong> <%= @moto.chassis %></p>
+                        <p><strong>Ano:</strong> <%= @moto.year_of_manufacture %></p>
+                        <p><strong>Cor:</strong> <%= @moto.color %></p>
+                    </div>
+                    <!-- Coluna direita: dados complementares -->
+                    <div class="col-md-6">
+                        <p><strong>KM Atual:</strong><%= number_with_delimiter(@moto.current_km) %></p>
+                        <p><strong>Data da Compra:</strong><%= l(@moto.purchase_date, formt: :long) %></p>
+                        <p><strong>Nota Fiscal:</strong><%= @moto.invoice_number %></p>
+                        <p>
+                            <strong>Status da Garantia</strong>
+                            <% if @moto.em_garantia? %>
+                                <span class="badge bg-success">Em Garantia</span><br>
+                                <small class="text-muted"><%= @moto.info_guarantee %></small>
+                            <% else %>
+                                <span class="badge bg-secondary">Fora da Garantia</span>
+                            <% end %>
+                        </p>                        
+                    </div>
+                </div>
+                <!-- Botões de ação -->
+                <div class="mt-3">
+                    <%= link_to "Editar Moto", edit_moto_path(@moto), class: "btn btn-warning" %>
+                    <%= link_to "Agendar Revisão", new_moto_scheduling_path(@moto), class: "btn btn-success" %>
+                    <%= link_to "Voltar", motorcycles_path, class: "btn btn-secondary" %>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Histórico de Agendamentos -->
+<div class="card mb-4">
+    <div class="card-header">
+        <h5>Histórico de Agendamentos</h5>
+    </div>
+    <div class="card-body">
+        <% if @schedulings.any? %>
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                      <th>Data</th>
+                      <th>Tipo</th>
+                      <th>Status</th>
+                    <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody>
+                <%# Percorre todos os agendamentos associados à moto %>
+                <% @schedulings.each do |scheduling| %>
+                  <tr>
+                    <!-- Data do agendamento -->
+                    <td><%= l(scheduling.scheduled_time_date, format: :short) %></td>
+                    <!-- Tipo de serviço (garantia ou normal) -->
+                    <td>
+                      <% if scheduling.service_type == 'garantia' %>
+                        <span class="badge bg-success">Garantia</span>
+                      <% else %>
+                        <span class="badge bg-primary">Normal</span>
+                      <% end %>
+                    </td>
+                    <!-- Status atual do agendamento -->
+                    <%# Exibe o status do agendamento com cores diferentes %>
+                    <td>
+                      <% case scheduling.status %>
+                      <% when 'pendente' %>
+                        <span class="badge bg-warning">Pendente</span>
+                      <% when 'confirmado' %>
+                        <span class="badge bg-info">Confirmado</span>
+                      <% when 'realizado' %>
+                        <span class="badge bg-success">Realizado</span>
+                      <% when 'cancelado' %>
+                        <span class="badge bg-danger">Cancelado</span>
+                      <% end %>
+                    </td>
+                    <!-- Botão para visualizar detalhes do agendamento -->
+                    <td>
+                      <%= link_to "Ver Detalhes", scheduling, class: "btn btn-sm btn-info" %>
+                    </td>
+                  </tr>
+                <% end %>
+              </tbody>
+            </table>
+          </div>
+        <% else %>
+          <p class="text-muted">Nenhum agendamento ainda.</p>
+        <% end %>
+    </div>
+</div>
+
+<!-- Histórico de Revisões -->
+<div class="card">
+    <div class="card-header">
+        <h5>Histórico de Revisões</h5>
+    </div>
+    <div class="card-body">
+        <%# Verifica se há revisões registradas para a moto %>
+        <% if @reviews.any? %>
+          <div class="table-responsive">
+            <table class="table table-striped">
+              <thead>
+                <tr>
+                  <th>Data</th>
+                  <th>KM</th>
+                  <th>Mecânico</th>
+                  <th>Tipo</th>
+                  <th>Valor</th>
+                </tr>
+              </thead>
+              <tbody>
+                <%# Percorre todas as revisões relacionadas à moto %>
+                <% @reviews.each do |revisao| %>
+                  <tr>
+                    <td><%= l(revisao.start_date, format: :short) %></td>
+                    <td><%= number_with_delimiter(revisao.km_review) %> km</td>
+                    <td><%= revisao.mechanic.name %></td>
+                    <td>
+                      <% if revisao.service_type == 'garantia' %>
+                        <span class="badge bg-success">Garantia</span>
+                      <% else %>
+                        <span class="badge bg-primary">Normal</span>
+                      <% end %>
+                    </td>
+                    <td>R$ <%= number_to_currency(revisao.total_value , unit: "", precision: 2) %></td>
+                  </tr>
+                <% end %>
+              </tbody>
+            </table>
+          </div>
+        <% else %>
+          <p class="text-muted">Nenhuma revisão realizada ainda.</p>
+        <% end %>
+      </div>
+    </div>
+</div>
+
+<!-- Info do Modelo -->
+<div class="col-md-4">
+    <div class="card">
+      <div class="card-header">
+        <h5>Sobre o Modelo</h5>
+      </div>
+      <div class="card-body">
+        <h6><%= @moto.motorcycle_model.name %></h6>
+        <p><strong>Cilindrada:</strong> <%= @moto.motorcycle_model.displacement %>cc</p>
+        <%# Exibe descrição apenas se estiver presente %>
+        <% if @moto.motorcycle_model.description.present? %>
+          <p class="text-muted small"><%= @moto.motorcycle_model.description %></p>
+        <% end %>
+        
+        <hr>
+        
+        <!-- Informações da cobertura de garantia -->
+        <p class="mb-1"><strong>Cobertura de Garantia:</strong></p>
+        <p class="small text-muted">
+          <%= @moto.motorcycle_model.warranty_months %> meses ou 
+          <%= number_with_delimiter(@moto.motorcycle_model.warranty_km) %> km
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
