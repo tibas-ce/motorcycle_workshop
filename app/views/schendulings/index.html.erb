@@ -1,2 +1,128 @@
-<h1>Schendulings#index</h1>
-<p>Find me in app/views/schendulings/index.html.erb</p>
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h1>Meus Agendamentos</h1>
+  <%= link_to "Novo Agendamento", motorcycles_path, class: "btn btn-primary" %>
+</div>
+
+<% if @schedulings.any? %>
+  <!-- Agendamentos Futuros -->
+  <%# Filtra apenas os agendamentos futuros e que não estão cancelados %>
+  <% futuros = @schedulings.select { |a| a.scheduled_time_date >= Time.current && a.status != 'cancelado' } %>
+  <% if futuros.any? %>
+    <h3 class="mb-3">Próximos Agendamentos</h3>
+    <div class="row mb-4">
+      <% futuros.each do |agendamento| %>
+        <div class="col-md-6 mb-3">
+          <div class="card border-primary">
+            <div class="card-header bg-primary text-white">
+              <div class="d-flex justify-content-between align-items-center">
+                <strong><%= l(agendamento.scheduled_time_date, format: :long) %></strong>
+                <%# Exibe o tipo de serviço: garantia ou normal %>
+                <% if agendamento.service_type == 'garantia' %>
+                  <span class="badge bg-success">Garantia</span>
+                <% else %>
+                  <span class="badge bg-light text-dark">Normal</span>
+                <% end %>
+              </div>
+            </div>
+             <%# Informações principais da moto associada %>
+            <div class="card-body">
+              <h5 class="card-title"><%= agendamento.motorcycle.motorcycle_model.name %></h5>
+              <p class="card-text">
+                <strong>Placa:</strong> <%= agendamento.motorcycle.license_plate %><br>
+                <strong>KM:</strong> <%= number_with_delimiter(agendamento.current_scheduling_km) %> km<br>
+                <strong>Status:</strong> 
+                <% case agendamento.status %>
+                <% when 'pendente' %>
+                  <span class="badge bg-warning text-dark">Aguardando Confirmação</span>
+                <% when 'confirmado' %>
+                  <span class="badge bg-info">Confirmado</span>
+                <% end %>
+              </p>
+              <%# Observações do cliente (caso existam) %>
+              <% if agendamento.client_observations.present? %>
+                <p class="card-text small text-muted">
+                  <strong>Observações:</strong> <%= agendamento.client_observations %>
+                </p>
+              <% end %>
+              <%# Ações disponíveis (ver detalhes e cancelar) %>
+              <div class="d-flex gap-2 mt-3">
+                <%= link_to "Ver Detalhes", agendamento, class: "btn btn-sm btn-info" %>
+                <% if agendamento.status == 'pendente' %>
+                  <%= button_to "Cancelar", agendamento, method: :delete,
+                      data: { confirm: "Tem certeza que deseja cancelar?" },
+                      class: "btn btn-sm btn-danger" %>
+                <% end %>
+              </div>
+            </div>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  <% end %>
+
+  <!-- Histórico -->
+  <%# Filtra os agendamentos passados, cancelados ou já realizados %>
+  <% historico = @schedulings.select { |a| a.scheduled_time_date < Time.current || a.status == 'cancelado' || a.status == 'realizado' } %>
+  <% if historico.any? %>
+    <h3 class="mb-3">Histórico</h3>
+    <div class="table-responsive">
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th>Data</th>
+            <th>Moto</th>
+            <th>Tipo</th>
+            <th>KM</th>
+            <th>Status</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% historico.each do |agendamento| %>
+            <tr>
+              <td><%= l(agendamento.scheduled_time_date, format: :short) %></td>
+              <td>
+                <%= agendamento.motorcycle.motorcycle_model.name %><br>
+                <small class="text-muted"><%= agendamento.motorcycle.license_plate %></small>
+              </td>
+              <%# Exibe o tipo de serviço: garantia ou normal %>
+              <td>
+                <% if agendamento.service_type == 'garantia' %>
+                  <span class="badge bg-success">Garantia</span>
+                <% else %>
+                  <span class="badge bg-primary">Normal</span>
+                <% end %>
+              </td>
+              <%# Exibe o KM do agendamento %>
+              <td><%= number_with_delimiter(agendamento.current_scheduling_km) %></td>
+              <%# Exibe o status atual %>
+              <td>
+                <% case agendamento.status %>
+                <% when 'realizado' %>
+                  <span class="badge bg-success">Realizado</span>
+                <% when 'cancelado' %>
+                  <span class="badge bg-danger">Cancelado</span>
+                <% when 'pendente' %>
+                  <span class="badge bg-warning text-dark">Pendente</span>
+                <% when 'confirmado' %>
+                  <span class="badge bg-info">Confirmado</span>
+                <% end %>
+              </td>
+              <%# Ação para visualizar detalhes %>
+              <td>
+                <%= link_to "Ver", agendamento, class: "btn btn-sm btn-info" %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  <% end %>
+
+<% else %>
+  <!-- Mensagem exibida quando o usuário não possui agendamentos -->
+  <div class="alert alert-info">
+    <h5>Nenhum agendamento encontrado</h5>
+    <p class="mb-0">Você ainda não agendou nenhuma revisão. <%= link_to "Acesse suas motos", motorcycles_path %> para agendar.</p>
+  </div>
+<% end %>
