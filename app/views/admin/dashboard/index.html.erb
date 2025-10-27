@@ -1,2 +1,84 @@
-<h1>Admin::Dashboard#index</h1>
-<p>Find me in app/views/admin/dashboard/index.html.erb</p>
+<!-- Título principal da página -->
+<h1>Dashboard Administrativo</h1>
+
+<!-- Seção de estatísticas principais -->
+<div class="row mt-4">
+
+  <!-- Card: quantidade de agendamentos pendentes -->
+  <div class="col-md-3">
+    <div class="card text-white bg-primary">
+      <div class="card-body">
+        <h5 class="card-title">Agendamentos Pendentes</h5>
+        <h2><%= @schedulings_pending %></h2>
+        <%= link_to "Ver Todos", admin_schedulings_path, class: "btn btn-light btn-sm" %>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Card: total de motos cadastradas -->
+  <div class="col-md-3">
+    <div class="card text-white bg-success">
+      <div class="card-body">
+        <h5 class="card-title">Total de Motos</h5>
+        <h2><%= @motorcycles_total %></h2>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Card: número total de usuários -->
+  <div class="col-md-3">
+    <div class="card text-white bg-info">
+      <div class="card-body">
+        <h5 class="card-title">Usuários Cadastrados</h5>
+        <h2><%= @users_total %></h2>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Card: modelos de motos disponíveis -->
+  <div class="col-md-3">
+    <div class="card text-white bg-warning">
+      <div class="card-body">
+        <h5 class="card-title">Modelos Disponíveis</h5>
+        <h2><%= MotorcycleModel.count %></h2>
+        <%= link_to "Gerenciar", admin_motorcycle_models_path, class: "btn btn-light btn-sm" %>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Segunda linha: atalhos e informações do sistema -->
+<div class="row mt-4">
+  
+  <!-- Coluna esquerda: ações rápidas para o administrador -->
+  <div class="col-md-6">
+    <div class="card">
+      <div class="card-header">
+        <h5>Ações Rápidas</h5>
+      </div>
+      <div class="card-body">
+        <div class="d-grid gap-2">
+          <%= link_to "➕ Cadastrar Novo Modelo de Moto", new_admin_motorcycle_model_path, class: "btn btn-primary" %>
+          <%= link_to "➕ Cadastrar Nova Peça", new_admin_part_path, class: "btn btn-success" %>
+          <%= link_to "➕ Cadastrar Mecânico", new_admin_mechanic_path, class: "btn btn-info" %>
+          <%= link_to "📋 Ver Todos os Agendamentos", admin_schedulings_path, class: "btn btn-warning" %>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Coluna direita: informações e contadores do sistema -->
+  <div class="col-md-6">
+    <div class="card">
+      <div class="card-header">
+        <h5>Informações do Sistema</h5>
+      </div>
+      <div class="card-body">
+        <p><strong>Total de Peças Cadastradas:</strong> <%= Part.count %></p>
+        <p><strong>Total de Mecânicos:</strong> <%= Mechanic.count %></p>
+        <p><strong>Revisões Realizadas:</strong> <%= Review.where(status: 'concluida').count %></p>
+        <p class="mb-0"><strong>Data do Sistema:</strong> <%= l(Date.today, format: :long) %></p>
+      </div>
+    </div>
+  </div>
+</div>
