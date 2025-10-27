@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Admin - Oficina Royal Enfield</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+
+    <!-- Tags de segurança do Rails -->
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+
+    <!-- Importa o CSS principal da aplicação e ativa o recarregamento com Turbo -->
+    <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
+
+    <!-- Importa os scripts definidos no importmap -->
+    <%= javascript_importmap_tags %>
+
+    <!-- Importa o CSS do Bootstrap 5 via CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  </head>
+
+  <body>
+    <!-- Navbar principal do painel administrativo -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-danger">
+      <div class="container-fluid">
+        <!-- Link de logo/título que leva ao dashboard admin -->
+        <%= link_to "🔧 Admin - Royal Enfield", admin_dashboard_path, class: "navbar-brand" %>
+        
+        <!-- Botão para abrir/fechar menu em telas pequenas -->
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarAdmin">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        
+        <!-- Itens do menu -->
+        <div class="collapse navbar-collapse" id="navbarAdmin">
+          <!-- Links principais do painel -->
+          <ul class="navbar-nav me-auto">
+            <li class="nav-item">
+              <%= link_to "Dashboard", admin_dashboard_path, class: "nav-link" %>
+            </li>
+            <li class="nav-item">
+              <%= link_to "Modelos de Motos", admin_motorcycle_models_path, class: "nav-link" %>
+            </li>
+            <li class="nav-item">
+              <%= link_to "Peças", admin_parts_path, class: "nav-link" %>
+            </li>
+            <li class="nav-item">
+              <%= link_to "Mecânicos", admin_mechanics_path, class: "nav-link" %>
+            </li>
+            <li class="nav-item">
+              <%= link_to "Agendamentos", admin_schedulings_path, class: "nav-link" %>
+            </li>
+            <li class="nav-item">
+              <%= link_to "Revisões", admin_reviews_path, class: "nav-link" %>
+            </li>
+          </ul>
+          
+          <!-- Área do canto direito com opções do usuário -->
+          <ul class="navbar-nav">
+            <!-- Link para abrir o site público em nova aba -->
+            <li class="nav-item">
+              <%= link_to "Ver Site", root_path, class: "nav-link", target: "_blank" %>
+            </li>
+
+            <!-- Dropdown com nome do usuário logado e opção de sair -->
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                <%= current_user.name %>
+              </a>
+              <ul class="dropdown-menu">
+                <li><%= button_to "Sair", destroy_user_session_path, method: :delete, class: "dropdown-item" %></li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Exibe mensagens flash de sucesso -->
+    <% if notice %>
+      <div class="alert alert-success alert-dismissible fade show m-3" role="alert">
+        <%= notice %>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      </div>
+    <% end %>
+    
+    <!-- Exibe mensagens flash de erro/alerta -->
+    <% if alert %>
+      <div class="alert alert-danger alert-dismissible fade show m-3" role="alert">
+        <%= alert %>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      </div>
+    <% end %>
+
+    <!-- Área principal do layout onde o conteúdo de cada página será inserido -->
+    <main class="container-fluid my-4">
+      <%= yield %>
+    </main>
+
+    <!-- Script do Bootstrap (interatividade: dropdown, modal, etc.) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  </body>
+</html>

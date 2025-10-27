@@ -1,2 +1,8 @@
-<h1>Motorcycles#edit</h1>
-<p>Find me in app/views/motorcycles/edit.html.erb</p>
+<h1>Editar Moto</h1>
+
+<div class="card mt-4">
+    <div class="card-body">
+        <%# Renderiza o partial do formulário reutilizável (_form.html.erb) %>
+        <%= render 'form', moto: @motorcycle %>
+    </div>
+</div>
