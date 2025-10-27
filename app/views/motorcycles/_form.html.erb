@@ -1,0 +1,71 @@
+<!-- Formulário de cadastro/edição de motocicleta -->
+<%= form_with(model: motorcycle, local: true) do |form| %>
+  <%# Exibe mensagens de erro caso a validação falhe %>
+  <% if motorcycle.errors.any? %>
+    <div class="alert alert-danger">
+      <h5><%= pluralize(motorcycle.errors.count, "erro") %> impediram o salvamento:</h5>
+      <ul class="mb-0">
+        <% motorcycle.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+  <!-- Campo de seleção do modelo da motocicleta -->
+  <div class="mb-3">
+    <%= form.label :motorcycle_model_id, "Modelo", class: "form-label" %>
+    <%= form.collection_select :motorcycle_model_id, @motorcycle_models, :id, :nome, 
+        { prompt: "Selecione o modelo" }, { class: "form-select" } %>
+  </div>
+
+  <!-- Campos básicos de identificação da moto -->
+  <div class="row">
+    <div class="col-md-6 mb-3">
+      <%= form.label :license_plate, class: "form-label" %>
+      <%= form.text_field :license_plate, class: "form-control", placeholder: "ABC-1234" %>
+    </div>
+
+    <div class="col-md-6 mb-3">
+      <%= form.label :chassis, class: "form-label" %>
+      <%= form.text_field :chassis, class: "form-control" %>
+    </div>
+  </div>
+
+  <!-- Campos com informações adicionais -->
+  <div class="row">
+    <div class="col-md-4 mb-3">
+      <%= form.label :year_of_manufacture, "Ano", class: "form-label" %>
+      <%= form.number_field :year_of_manufacture, class: "form-control", 
+          min: 2018, max: Date.current.year + 1 %>
+    </div>
+
+    <div class="col-md-4 mb-3">
+      <%= form.label :color, class: "form-label" %>
+      <%= form.text_field :color, class: "form-control" %>
+    </div>
+
+    <div class="col-md-4 mb-3">
+      <%= form.label :current_km, "KM Atual", class: "form-label" %>
+      <%= form.number_field :current_km, class: "form-control", min: 0 %>
+    </div>
+  </div>
+
+  <!-- Informações de compra -->
+  <div class="row">
+    <div class="col-md-6 mb-3">
+      <%= form.label :purchase_date, "Data da Compra", class: "form-label" %>
+      <%= form.date_field :purchase_date, class: "form-control" %>
+    </div>
+
+    <div class="col-md-6 mb-3">
+      <%= form.label :invoice_number, "Número da Nota Fiscal", class: "form-label" %>
+      <%= form.text_field :invoice_number, class: "form-control" %>
+    </div>
+  </div>
+
+  <!-- Botões de ação -->
+  <div class="mt-4">
+    <%= form.submit "Salvar", class: "btn btn-primary" %>
+    <%= link_to "Cancelar", motorcycles_path, class: "btn btn-secondary" %>
+  </div>
+<% end %>
