@@ -1,2 +1,111 @@
-<h1>Schendulings#new</h1>
-<p>Find me in app/views/schendulings/new.html.erb</p>
+<h1>Agendar Revisão</h1>
+<!-- Exibe informações básicas da moto selecionada -->
+<p class="text-muted">Moto: <strong><%= @motorcycle.motorcycle_model.name %></strong> - Placa: <strong><%= @motorcycle.license_plate %></strong></p>
+
+<div class="row">
+  <!-- Seção: Formulário de agendamento -->
+  <div class="col-md-8">
+    <div class="card mt-4">
+      <div class="card-body">
+        <%# Formulário principal de criação de agendamento vinculado à moto %>
+        <%= form_with(model: [@motorcycle, @scheduling], local: true) do |form| %>
+          <%# Exibe mensagens de erro caso o formulário não passe na validação %>
+          <% if @scheduling.errors.any? %>
+            <div class="alert alert-danger">
+              <h5><%= pluralize(@scheduling.errors.count, "erro") %> impediram o agendamento:</h5>
+              <ul class="mb-0">
+                <% @scheduling.errors.full_messages.each do |message| %>
+                  <li><%= message %></li>
+                <% end %>
+              </ul>
+            </div>
+          <% end %>
+
+          <%# Campo oculto que vincula o agendamento à moto atual %>
+          <%= form.hidden_field :motorcycle_id, value: @motorcycle.id %>
+
+          <!-- Campo: Data e hora do agendamento -->
+          <div class="mb-3">
+            <%= form.label :scheduled_time_date, "Data e Hora", class: "form-label" %>
+            <%= form.datetime_local_field :scheduled_time_date, 
+                class: "form-control",
+                min: Time.current.strftime("%Y-%m-%dT%H:%M") %>
+            <div class="form-text">Selecione a data e hora desejada para a revisão</div>
+          </div>
+
+          <div class="mb-3">
+            <%= form.label :tipo, "Tipo de Revisão", class: "form-label" %>
+            <%= form.select :tipo, 
+                options_for_select(@service_types.map { |t| [t == 'garantia' ? 'Revisão de Garantia' : 'Revisão Normal', t] }),
+                {},
+                class: "form-select" %>
+            <%# Exibe informações sobre o status da garantia da moto %>
+            <div class="form-text">
+              <% if @motorcycle.in_guarantee? %>
+                <span class="text-success">✓ Sua moto está em garantia (<%= @motorcycle.info_guarantee %>)</span>
+              <% else %>
+                <span class="text-muted">Sua moto não está mais em garantia</span>
+              <% end %>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <%= form.label :current_scheduling_km, "KM Atual", class: "form-label" %>
+            <%= form.number_field :current_scheduling_km, 
+                class: "form-control",
+                value: @motorcycle.current_km,
+                min: 0 %>
+          </div>
+
+          <div class="mb-3">
+            <%= form.label :client_observations, "Observações", class: "form-label" %>
+            <%= form.text_area :client_observations, 
+                class: "form-control",
+                rows: 4,
+                placeholder: "Descreva problemas, barulhos ou comportamentos estranhos da moto..." %>
+          </div>
+
+          <div class="mt-4">
+            <%= form.submit "Agendar Revisão", class: "btn btn-primary" %>
+            <%= link_to "Cancelar", @motorcycle, class: "btn btn-secondary" %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Seção lateral: Informações úteis -->
+  <div class="col-md-4">
+    <div class="card mt-4">
+      <div class="card-header">
+        <h5>Informações Importantes</h5>
+      </div>
+      <div class="card-body">
+        <h6>Revisões de Garantia</h6>
+        <ul class="small">
+          <li>Devem ser realizadas na oficina autorizada</li>
+          <li>Mão de obra gratuita</li>
+          <li>Peças cobertas pela garantia não são cobradas</li>
+          <li>Requer nota fiscal da compra</li>
+        </ul>
+        
+        <hr>
+        
+        <h6>Revisões Normais</h6>
+        <ul class="small">
+          <li>Mão de obra cobrada</li>
+          <li>Todas as peças são cobradas</li>
+          <li>Orçamento prévio disponível</li>
+        </ul>
+        
+        <hr>
+        
+        <h6>Horários de Atendimento</h6>
+        <p class="small mb-0">
+          Segunda a Sexta: 08:00 - 18:00<br>
+          Sábado: 08:00 - 12:00
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
