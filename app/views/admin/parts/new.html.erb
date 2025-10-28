@@ -1,2 +1,11 @@
-<h1>Admin::Parts#new</h1>
-<p>Find me in app/views/admin/parts/new.html.erb</p>
+<!-- Página para cadastrar uma nova peça de motocicleta -->
+
+<h1>Cadastrar Nova Peça</h1>
+
+<!-- Card que envolve o formulário -->
+<div class="card mt-4">
+  <div class="card-body">
+    <%# Renderiza o formulário parcial _form.html.erb, passando o objeto @part %>
+    <%= render 'form', part: @part %>
+  </div>
+</div>
