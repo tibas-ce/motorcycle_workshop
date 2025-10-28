@@ -1,2 +1,11 @@
-<h1>Admin::MotorcycleModels#edit</h1>
-<p>Find me in app/views/admin/motorcycle_models/edit.html.erb</p>
+<!-- Página para editar um modelo de motocicleta existente -->
+
+<h1>Editar Modelo de Moto</h1>
+
+<!-- Card que contém o formulário de edição -->
+<div class="card mt-4">
+  <div class="card-body">
+    <%# Renderiza o partial _form.html.erb, reutilizado também na criação %>
+    <%= render 'form', motorcycle_model: @motorcycle_model %>
+  </div>
+</div>

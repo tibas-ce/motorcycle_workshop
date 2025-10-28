@@ -1,2 +1,176 @@
-<h1>Admin::MotorcycleModels#show</h1>
-<p>Find me in app/views/admin/motorcycle_models/show.html.erb</p>
+<!-- Página de detalhes de um modelo de moto no painel administrativo -->
+<div class="row">
+  <div class="col-md-8">
+    <!-- Título com o nome do modelo -->
+    <h1><%= @motorcycle_model.name %></h1>
+    
+    <!-- Card principal com informações do modelo -->
+    <div class="card mb-4">
+      <div class="card-header">
+        <h5>Informações do Modelo</h5>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-6">
+            <p><strong>Cilindrada:</strong> <%= @motorcycle_model.displacement %>cc</p>
+            <p><strong>Ano Início:</strong> <%= @motorcycle_model.start_production_year %></p>
+
+            <%# Exibe o ano final apenas se estiver definido %>
+            <% if @motorcycle_model.end_production_year.present? %>
+              <p><strong>Ano Fim:</strong> <%= @motorcycle_model.end_production_year %></p>
+            <% end %>
+          </div>
+
+          <div class="col-md-6">
+            <p><strong>Garantia:</strong><br>
+              <%= @motorcycle_model.warranty_months %> meses ou 
+              <%= number_with_delimiter(@motorcycle_model.warranty_km) %> km
+            </p>
+          </div>
+        </div>
+        
+        <%# Mostra a descrição do modelo se existir %>
+        <% if @motorcycle_model.description.present? %>
+          <hr>
+          <p><strong>Descrição:</strong><br>
+            <%= simple_format(@motorcycle_model.description) %>
+          </p>
+        <% end %>
+        
+        <!-- Botões de ação -->
+        <div class="mt-3">
+          <%= link_to "Editar", edit_admin_motorcycle_model_path(@motorcycle_model), class: "btn btn-warning" %>
+          <%= link_to "Voltar", admin_motorcycle_models_path, class: "btn btn-secondary" %>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Card com as peças vinculadas ao modelo -->
+    <div class="card">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">Peças Vinculadas</h5>
+        <!-- Botão para abrir o modal de adição de peça -->
+        <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addPecaModal">
+          Adicionar Peça
+        </button>
+      </div>
+      <div class="card-body">
+        <%# Verifica se o modelo possui peças vinculadas %>
+        <% if @parts_linked.any? %>
+          <div class="table-responsive">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Peça</th>
+                  <th>Código</th>
+                  <th>Preço</th>
+                  <th>Obrigatória</th>
+                  <th>KM Troca</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody>
+                <%# Percorre todas as peças vinculadas ao modelo %>
+                <% @motorcycle_model.model_parts.includes(:part).each do |mp| %>
+                  <tr>
+                    <td><%= mp.part.name %></td>
+                    <td><%= mp.part.original_code %></td>
+                    <td>R$ <%= number_to_currency(mp.part.price, unit: "", precision: 2) %></td>
+
+                    <td>
+                      <%# Exibe se a peça é obrigatória ou opcional %>
+                      <% if mp.obrigatoria_revisao %>
+                        <span class="badge bg-warning">Obrigatória</span>
+                      <% else %>
+                        <span class="badge bg-secondary">Opcional</span>
+                      <% end %>
+                    </td>
+
+                    <td>
+                      <%# Exibe o KM de troca se definido %>
+                      <% if mp.km_replacement.present? %>
+                        <%= number_with_delimiter(mp.km_replacement) %> km
+                      <% else %>
+                        -
+                      <% end %>
+                    </td>
+
+                    <td>
+                      <!-- Botão para desvincular peça -->
+                      <%= button_to "Desvincular", 
+                          admin_motorcycle_model_model_part_path(@motorcycle_model, mp),
+                          method: :delete,
+                          data: { confirm: "Tem certeza?" },
+                          class: "btn btn-sm btn-danger" %>
+                    </td>
+                  </tr>
+                <% end %>
+              </tbody>
+            </table>
+          </div>
+        <% else %>
+          <p class="text-muted">Nenhuma peça vinculada a este modelo ainda.</p>
+        <% end %>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Coluna lateral com estatísticas -->
+  <div class="col-md-4">
+    <div class="card">
+      <div class="card-header">
+        <h5>Estatísticas</h5>
+      </div>
+      <div class="card-body">
+        <p><strong>Motos Cadastradas:</strong> <%= @motorcycle_model.motorcycles.count %></p>
+        <p><strong>Peças Vinculadas:</strong> <%= @parts_linked.count %></p>
+        <p class="mb-0"><strong>Peças Obrigatórias:</strong> 
+          <%= @motorcycle_model.model_parts.where(obrigatoria_revisao: true).count %></p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal para adicionar nova peça ao modelo -->
+<div class="modal fade" id="addPecaModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <%# Formulário para vincular uma peça ao modelo %>
+      <%= form_with(url: admin_motorcycle_model_model_parts_path(@motorcycle_model), local: true) do |form| %>
+        <div class="modal-header">
+          <h5 class="modal-title">Vincular Peça ao Modelo</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <!-- Seleção da peça -->
+          <div class="mb-3">
+            <%= form.label :part_id, "Peça", class: "form-label" %>
+            <%= form.collection_select :part_id, 
+                @pecas_disponiveis, :id, :name,
+                { prompt: "Selecione uma peça" },
+                { class: "form-select" } %>
+          </div>
+          
+          <!-- Checkbox para marcar se é obrigatória -->
+          <div class="mb-3">
+            <div class="form-check">
+              <%= form.check_box :obrigatoria_revisao, class: "form-check-input" %>
+              <%= form.label :obrigatoria_revisao, "Obrigatória na revisão?", class: "form-check-label" %>
+            </div>
+          </div>
+          
+          <!-- Campo para indicar o KM de troca -->
+          <div class="mb-3">
+            <%= form.label :km_replacement, "KM para Troca", class: "form-label" %>
+            <%= form.number_field :km_replacement, class: "form-control", placeholder: "Ex: 5000" %>
+            <div class="form-text">Deixe em branco se não houver intervalo específico</div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <%= form.submit "Vincular Peça", class: "btn btn-primary" %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>

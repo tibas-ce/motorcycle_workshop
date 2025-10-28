@@ -1,2 +1,54 @@
-<h1>Admin::Mechanics#edit</h1>
-<p>Find me in app/views/admin/mechanics/edit.html.erb</p>
+<!-- Página de edição de um mecânico -->
+<h1>Editar Mecânico</h1>
+
+<div class="card mt-4">
+  <div class="card-body">
+    <%= form_with(model: [:admin, @mechanic], local: true) do |form| %>
+      
+      <!-- Seção de dados pessoais -->
+      <h5 class="mb-3">Dados Pessoais</h5>
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <%= label_tag :name, "Nome Completo", class: "form-label" %>
+          <%= text_field_tag :name, @mechanic.user.nome, class: "form-control", required: true %>
+        </div>
+
+        <div class="col-md-6 mb-3">
+          <%= label_tag :phone_number, "Telefone", class: "form-label" %>
+          <%= telephone_field_tag :phone_number, @mechanic.user.phone_number, class: "form-control" %>
+        </div>
+      </div>
+
+      <hr>
+
+      <!-- Seção de dados profissionais -->
+      <h5 class="mb-3">Dados Profissionais</h5>
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <%= form.label :professional_registration, "Registro Profissional", class: "form-label" %>
+          <%= form.text_field :professional_registration, class: "form-control", required: true %>
+        </div>
+
+        <div class="col-md-6 mb-3">
+          <%= form.label :specialty, "Especialidade", class: "form-label" %>
+          <%= form.text_field :specialty, class: "form-control" %>
+        </div>
+      </div>
+
+      <!-- Checkbox para status ativo/inativo -->
+      <div class="mb-3">
+        <div class="form-check">
+          <%= form.check_box :asset, class: "form-check-input" %>
+          <%= form.label :asset, "Mecânico ativo?", class: "form-check-label" %>
+        </div>
+      </div>
+
+      <!-- Botões de ação -->
+      <div class="mt-4">
+        <%= form.submit "Atualizar Mecânico", class: "btn btn-primary" %>
+        <%= link_to "Cancelar", admin_mechanic_path(@mechanic), class: "btn btn-secondary" %>
+      </div>
+
+    <% end %>
+  </div>
+</div>

@@ -1,2 +1,11 @@
-<h1>Admin::Parts#edit</h1>
-<p>Find me in app/views/admin/parts/edit.html.erb</p>
+<!-- Página para editar uma peça de motocicleta -->
+
+<h1>Editar Peça</h1>
+
+<!-- Card que envolve o formulário -->
+<div class="card mt-4">
+  <div class="card-body">
+    <%# Renderiza o formulário parcial _form.html.erb, passando o objeto @part %>
+    <%= render 'form', part: @part %>
+  </div>
+</div>

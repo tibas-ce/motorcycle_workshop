@@ -1,2 +1,41 @@
-<h1>Admin::MotorcycleModels#index</h1>
-<p>Find me in app/views/admin/motorcycle_models/index.html.erb</p>
+<!-- Título da página e botão de ação -->
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h1>Modelos de Motos Royal Enfield</h1>
+  <%= link_to "Cadastrar Novo Modelo", new_admin_motorcycle_model_path, class: "btn btn-primary" %>
+</div>
+
+<!-- Verifica se existem modelos cadastrados -->
+<% if @motorcycle_models.any? %>
+  <div class="row">
+    <% @motorcycle_models.each do |modelo| %>
+      <div class="col-md-4 mb-4">
+        <div class="card">
+          <div class="card-body">
+            <!-- Exibe informações principais do modelo -->
+            <h5 class="card-title"><%= modelo.name %></h5>
+            <p class="card-text">
+              <strong>Cilindrada:</strong> <%= modelo.displacement %>cc<br>
+              <strong>Garantia:</strong> <%= modelo.warranty_months %> meses ou <%= number_with_delimiter(modelo.warranty_km) %> km<br>
+              <strong>Peças vinculadas:</strong> <%= modelo.parts.count %>
+            </p>
+            
+            <!-- Ações disponíveis para o modelo -->
+            <div class="d-flex gap-2">
+              <%= link_to "Ver Detalhes", admin_motorcycle_model_path(modelo), class: "btn btn-sm btn-info" %>
+              <%= link_to "Editar", edit_admin_motorcycle_model_path(modelo), class: "btn btn-sm btn-warning" %>
+              <%= button_to "Excluir", admin_motorcycle_model_path(modelo), method: :delete,
+                  data: { confirm: "Tem certeza? Isso excluirá todas as relações com peças." },
+                  class: "btn btn-sm btn-danger" %>
+            </div>
+          </div>
+        </div>
+      </div>
+    <% end %>
+  </div>
+
+<!-- Caso não existam modelos cadastrados -->
+<% else %>
+  <div class="alert alert-info">
+    Nenhum modelo cadastrado. <%= link_to "Cadastre o primeiro modelo", new_admin_motorcycle_model_path %>
+  </div>
+<% end %>

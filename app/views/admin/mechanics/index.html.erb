@@ -1,2 +1,58 @@
-<h1>Admin::Mechanics#index</h1>
-<p>Find me in app/views/admin/mechanics/index.html.erb</p>
+<!-- Página de listagem de mecânicos -->
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h1>Mecânicos</h1>
+  <%= link_to "Cadastrar Novo Mecânico", new_admin_mechanic_path, class: "btn btn-primary" %>
+</div>
+
+<%# Verifica se existem mecânicos cadastrados %>
+<% if Mechanic.any? %>
+  <div class="row">
+    <%# Itera sobre todos os mecânicos, incluindo a associação com usuário %>
+    <% Mechanic.includes(:user).each do |mecanico| %>
+      <div class="col-md-6 mb-4">
+        <%# Card do mecânico; borda verde se ativo %>
+        <div class="card <%= 'border-success' if mecanico.asset %>">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-start">
+              <div>
+                <h5 class="card-title"><%= mecanico.name %></h5>
+                <p class="card-text">
+                  <strong>Registro:</strong> <%= mecanico.professional_registration %><br>
+                  <strong>Email:</strong> <%= mecanico.email %><br>
+                  <%# Exibe telefone se disponível %>
+                  <% if mecanico.phone_number.present? %>
+                    <strong>Telefone:</strong> <%= mecanico.phone_number %><br>
+                  <% end %>
+                  <%# Exibe especialidade se disponível %>
+                  <% if mecanico.specialty.present? %>
+                    <strong>Especialidade:</strong> <%= mecanico.specialty %><br>
+                  <% end %>
+                  <strong>Revisões Realizadas:</strong> <%= mecanico.reviews.count %>
+                </p>
+              </div>
+              <div>
+                <%# Badge indicando status do mecânico %>
+                <% if mecanico.asset %>
+                  <span class="badge bg-success">Ativo</span>
+                <% else %>
+                  <span class="badge bg-danger">Inativo</span>
+                <% end %>
+              </div>
+            </div>
+            
+            <%# Botões de ação para o mecânico %>
+            <div class="d-flex gap-2 mt-3">
+              <%= link_to "Ver Detalhes", admin_mechanic_path(mecanico), class: "btn btn-sm btn-info" %>
+              <%= link_to "Editar", edit_admin_mechanic_path(mecanico), class: "btn btn-sm btn-warning" %>
+            </div>
+          </div>
+        </div>
+      </div>
+    <% end %>
+  </div>
+<% else %>
+  <%# Mensagem quando não há mecânicos cadastrados %>
+  <div class="alert alert-info">
+    Nenhum mecânico cadastrado. <%= link_to "Cadastre o primeiro mecânico", new_admin_mechanic_path %>
+  </div>
+<% end %>

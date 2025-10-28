@@ -1,2 +1,11 @@
-<h1>Admin::MotorcycleModels#new</h1>
-<p>Find me in app/views/admin/motorcycle_models/new.html.erb</p>
+<!-- Página para cadastrar um novo modelo de motocicleta -->
+
+<h1>Cadastrar Novo Modelo de Moto</h1>
+
+<!-- Card que contém o formulário de cadastro -->
+<div class="card mt-4">
+  <div class="card-body">
+    <%# Renderiza o partial _form.html.erb, compartilhado com o edit %>
+    <%= render 'form', motorcycle_model: @motorcycle_model %>
+  </div>
+</div>

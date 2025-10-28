@@ -1,2 +1,141 @@
-<h1>Admin::Mechanics#show</h1>
-<p>Find me in app/views/admin/mechanics/show.html.erb</p>
+<!-- Página de detalhes de um mecânico -->
+<div class="row">
+  <div class="col-md-8">
+    <h1><%= @mechanic.name %></h1>
+
+    <!-- Card com informações principais do mecânico -->
+    <div class="card mb-4">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">Informações do Mecânico</h5>
+        <%# Status ativo/inativo do mecânico %>
+        <% if @mechanic.asset %>
+          <span class="badge bg-success">Ativo</span>
+        <% else %>
+          <span class="badge bg-danger">Inativo</span>
+        <% end %>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-6">
+            <p><strong>Nome:</strong> <%= @mechanic.name %></p>
+            <p><strong>Email:</strong> <%= @mechanic.email %></p>
+            <%# Telefone opcional %>
+            <% if @mechanic.phone_number.present? %>
+              <p><strong>Telefone:</strong> <%= @mechanic.phone_number %></p>
+            <% end %>
+          </div>
+          <div class="col-md-6">
+            <p><strong>Registro Profissional:</strong> <%= @mechanic.professional_registration %></p>
+            <%# Especialidade opcional %>
+            <% if @mechanic.specialty.present? %>
+              <p><strong>Especialidade:</strong> <%= @mechanic.specialty %></p>
+            <% end %>
+            <p><strong>Cadastrado em:</strong> <%= l(@mechanic.created_at, format: :short) %></p>
+          </div>
+        </div>
+
+        <%# Botões de ação principais %>
+        <div class="mt-3">
+          <%= link_to "Editar", edit_admin_mechanic_path(@mechanic), class: "btn btn-warning" %>
+          <%= link_to "Voltar", admin_mechanics_path, class: "btn btn-secondary" %>
+        </div>
+      </div>
+    </div>
+
+    <!-- Histórico de Revisões do mecânico -->
+    <div class="card">
+      <div class="card-header">
+        <h5>Histórico de Revisões</h5>
+      </div>
+      <div class="card-body">
+        <% if @mechanic.reviews.any? %>
+          <div class="table-responsive">
+            <table class="table table-striped">
+              <thead>
+                <tr>
+                  <th>Data</th>
+                  <th>Moto</th>
+                  <th>Cliente</th>
+                  <th>Tipo</th>
+                  <th>Status</th>
+                  <th>Valor</th>
+                </tr>
+              </thead>
+              <tbody>
+                <%# Exibir últimas 20 revisões ordenadas por data %>
+                <% @mechanic.reviews.order(start_date: :desc).limit(20).each do |revisao| %>
+                  <tr>
+                    <td><%= l(revisao.start_date, format: :short) %></td>
+                    <td>
+                      <%= revisao.motorcycle.motorcycle_model.name %><br>
+                      <small class="text-muted"><%= revisao.motorcycle.license_plate %></small>
+                    </td>
+                    <td><%= revisao.motorcycle.user.name %></td>
+                    <td>
+                      <%# Tipo de serviço %>
+                      <% if revisao.service_type == 'garantia' %>
+                        <span class="badge bg-success">Garantia</span>
+                      <% else %>
+                        <span class="badge bg-primary">Normal</span>
+                      <% end %>
+                    </td>
+                    <td>
+                      <%# Status da revisão %>
+                      <% case revisao.status %>
+                      <% when 'concluida' %>
+                        <span class="badge bg-success">Concluída</span>
+                      <% when 'em_andamento' %>
+                        <span class="badge bg-warning">Em Andamento</span>
+                      <% when 'aguardando_peca' %>
+                        <span class="badge bg-info">Aguardando Peça</span>
+                      <% end %>
+                    </td>
+                    <td>R$ <%= number_to_currency(revisao.total_value, unit: "", precision: 2) %></td>
+                  </tr>
+                <% end %>
+              </tbody>
+            </table>
+          </div>
+        <% else %>
+          <p class="text-muted">Nenhuma revisão realizada ainda.</p>
+        <% end %>
+      </div>
+    </div>
+  </div>
+
+  <!-- Coluna lateral com estatísticas e ações rápidas -->
+  <div class="col-md-4">
+    <div class="card">
+      <div class="card-header">
+        <h5>Estatísticas</h5>
+      </div>
+      <div class="card-body">
+        <p><strong>Total de Revisões:</strong> <%= @mechanic.reviews.count %></p>
+        <p><strong>Revisões Concluídas:</strong> <%= @mechanic.reviews.where(status: 'concluida').count %></p>
+        <p><strong>Em Andamento:</strong> <%= @mechanic.reviews.where(status: 'em_andamento').count %></p>
+        <p class="mb-0"><strong>Valor Total Gerado:</strong><br>
+          R$ <%= number_to_currency(@mechanic.reviews.sum(:total_value), unit: "", precision: 2) %>
+        </p>
+      </div>
+    </div>
+
+    <!-- Ações rápidas: ativar/desativar mecânico -->
+    <div class="card mt-3">
+      <div class="card-header">
+        <h5>Ações Rápidas</h5>
+      </div>
+      <div class="card-body">
+        <% if @mechanic.asset %>
+          <%= button_to "Desativar Mecânico", admin_mechanic_path(@mechanic, mechanic: { asset: false }),
+              method: :patch,
+              data: { confirm: "Tem certeza que deseja desativar este mecânico?" },
+              class: "btn btn-warning w-100 mb-2" %>
+        <% else %>
+          <%= button_to "Ativar Mecânico", admin_mechanic_path(@mechanic, mechanic: { asset: true }),
+              method: :patch,
+              class: "btn btn-success w-100 mb-2" %>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>
