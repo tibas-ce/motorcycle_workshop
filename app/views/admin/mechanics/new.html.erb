@@ -1,2 +1,68 @@
-<h1>Admin::Mechanics#new</h1>
-<p>Find me in app/views/admin/mechanics/new.html.erb</p>
+<!-- Página para cadastro de novo mecânico -->
+<h1>Cadastrar Novo Mecânico</h1>
+
+<div class="card mt-4">
+  <div class="card-body">
+    <%# Formulário para criar um novo mecânico %>
+    <%= form_with(url: admin_mechanics_path, local: true) do |form| %>
+
+      <!-- Seção de dados de acesso -->
+      <h5 class="mb-3">Dados de Acesso</h5>
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <%= label_tag :name, "Nome Completo", class: "form-label" %>
+          <%= text_field_tag :name, nil, class: "form-control", required: true %>
+        </div>
+
+        <div class="col-md-6 mb-3">
+          <%= label_tag :email, "Email", class: "form-label" %>
+          <%= email_field_tag :email, nil, class: "form-control", required: true %>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <%= label_tag :password, "Senha", class: "form-label" %>
+          <%= password_field_tag :password, nil, class: "form-control", required: true, minlength: 6 %>
+          <div class="form-text">Mínimo 6 caracteres</div>
+        </div>
+
+        <div class="col-md-6 mb-3">
+          <%= label_tag :phone_number, "Telefone", class: "form-label" %>
+          <%= telephone_field_tag :phone_number, nil, class: "form-control", placeholder: "(83) 99999-9999" %>
+        </div>
+      </div>
+
+      <hr>
+
+      <!-- Seção de dados profissionais -->
+      <h5 class="mb-3">Dados Profissionais</h5>
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <%= label_tag :professional_registration, "Registro Profissional", class: "form-label" %>
+          <%= text_field_tag :professional_registration, nil, class: "form-control", required: true, placeholder: "MEC-001" %>
+        </div>
+
+        <div class="col-md-6 mb-3">
+          <%= label_tag :specialty, "Especialidade", class: "form-label" %>
+          <%= text_field_tag :specialty, nil, class: "form-control", placeholder: "Ex: Motor e Transmissão" %>
+        </div>
+      </div>
+
+      <%# Checkbox para status ativo do mecânico %>
+      <div class="mb-3">
+        <div class="form-check">
+          <%= check_box_tag :asset, "1", true, class: "form-check-input" %>
+          <%= label_tag :asset, "Mecânico ativo?", class: "form-check-label" %>
+        </div>
+      </div>
+
+      <%# Botões de ação %>
+      <div class="mt-4">
+        <%= submit_tag "Cadastrar Mecânico", class: "btn btn-primary" %>
+        <%= link_to "Cancelar", admin_mechanics_path, class: "btn btn-secondary" %>
+      </div>
+
+    <% end %>
+  </div>
+</div>
