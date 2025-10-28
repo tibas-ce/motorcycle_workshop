@@ -1,0 +1,71 @@
+<%# Formulário de criação/edição de um modelo de motocicleta no painel administrativo %>
+<%= form_with(model: [:admin, motorcycle_model], local: true) do |form| %>
+
+  <%# Exibe mensagens de erro se houver validações falhas %>
+  <% if motorcycle_model.errors.any? %>
+    <div class="alert alert-danger">
+      <h5><%= pluralize(motorcycle_model.errors.count, "erro") %> impediram o salvamento:</h5>
+      <ul class="mb-0">
+        <% motorcycle_model.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <!-- Campo para o nome do modelo -->
+  <div class="mb-3">
+    <%= form.label :name, "Nome do Modelo", class: "form-label" %>
+    <%= form.text_field :name, class: "form-control", placeholder: "Ex: Meteor 350" %>
+  </div>
+
+  <!-- Linha com cilindrada e anos de produção -->
+  <div class="row">
+    <div class="col-md-4 mb-3">
+      <%= form.label :displacement, "Cilindrada (cc)", class: "form-label" %>
+      <%= form.number_field :displacement, class: "form-control", placeholder: "350" %>
+    </div>
+
+    <div class="col-md-4 mb-3">
+      <%= form.label :start_production_year, "Ano Início", class: "form-label" %>
+      <%= form.number_field :start_production_year, class: "form-control", 
+          min: 2000, max: Date.current.year + 1 %>
+    </div>
+
+    <div class="col-md-4 mb-3">
+      <%= form.label :end_production_year, "Ano Fim (opcional)", class: "form-label" %>
+      <%= form.number_field :end_production_year, class: "form-control", 
+          min: 2000, max: Date.current.year + 1 %>
+      <div class="form-text">Deixe vazio se ainda está em fabricação</div>
+    </div>
+  </div>
+
+  <!-- Linha com informações de garantia -->
+  <div class="row">
+    <div class="col-md-6 mb-3">
+      <%= form.label :warranty_months, "Garantia (meses)", class: "form-label" %>
+      <%= form.number_field :warranty_months, class: "form-control", 
+          value: motorcycle_model.warranty_months || 36, min: 1 %>
+    </div>
+
+    <div class="col-md-6 mb-3">
+      <%= form.label :warranty_km, "Garantia (KM)", class: "form-label" %>
+      <%= form.number_field :warranty_km, class: "form-control", 
+          value: motorcycle_model.warranty_km || 30000, min: 1 %>
+    </div>
+  </div>
+
+  <!-- Campo para a descrição do modelo -->
+  <div class="mb-3">
+    <%= form.label :description, "Descrição", class: "form-label" %>
+    <%= form.text_area :description, class: "form-control", rows: 4,
+        placeholder: "Descrição detalhada do modelo..." %>
+  </div>
+
+  <!-- Botões de ação -->
+  <div class="mt-4">
+    <%= form.submit "Salvar Modelo", class: "btn btn-primary" %>
+    <%= link_to "Cancelar", admin_motorcycle_models_path, class: "btn btn-secondary" %>
+  </div>
+
+<% end %>
