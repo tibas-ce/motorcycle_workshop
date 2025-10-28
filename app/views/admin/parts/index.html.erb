@@ -1,2 +1,95 @@
-<h1>Admin::Parts#index</h1>
-<p>Find me in app/views/admin/parts/index.html.erb</p>
+<!-- Página de listagem de peças cadastradas no painel administrativo -->
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h1>Peças</h1>
+
+  <%# Botão para criar uma nova peça %>
+  <%= link_to "Cadastrar Nova Peça", new_admin_part_path, class: "btn btn-primary" %>
+</div>
+
+<%# Verifica se há peças cadastradas %>
+<% if @parts.any? %>
+  <!-- Se existirem peças, exibe filtros e tabela -->
+
+  <!-- Filtro por categoria de peça -->
+  <div class="mb-3">
+    <div class="btn-group" role="group">
+      <%# Link para visualizar todas as peças %>
+      <%= link_to "Todas", admin_parts_path, class: "btn btn-outline-primary" %>
+
+      <%# Gera botões dinamicamente para cada categoria existente %>
+      <% Part.pluck(:category).uniq.compact.each do |categoria| %>
+        <%= link_to categoria, admin_parts_path(category: categoria), class: "btn btn-outline-primary" %>
+      <% end %>
+    </div>
+  </div>
+
+  <!-- Tabela responsiva com as informações das peças -->
+  <div class="table-responsive">
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>Nome</th>
+          <th>Código</th>
+          <th>Categoria</th>
+          <th>Preço</th>
+          <th>Estoque</th>
+          <th>Modelos</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <%# Itera sobre todas as peças cadastradas %>
+        <% @parts.each do |peca| %>
+          <tr>
+            <td><%= peca.name %></td>
+
+            <%# Exibe o código da peça em destaque com tag <code> %>
+            <td><code><%= peca.original_code %></code></td>
+
+            <%# Exibe a categoria como badge colorida (se existir) %>
+            <td>
+              <% if peca.category.present? %>
+                <span class="badge bg-info"><%= peca.category %></span>
+              <% end %>
+            </td>
+
+            <%# Exibe o preço formatado em reais %>
+            <td>R$ <%= number_to_currency(peca.price, unit: "", precision: 2) %></td>
+
+            <%# Mostra o estoque com cores diferentes conforme a quantidade %>
+            <td>
+              <% if peca.stock > 10 %>
+                <span class="badge bg-success"><%= peca.stock %></span>
+              <% elsif peca.stock > 0 %>
+                <span class="badge bg-warning"><%= peca.stock %></span>
+              <% else %>
+                <span class="badge bg-danger"><%= peca.stock %></span>
+              <% end %>
+            </td>
+
+            <%# Mostra a quantidade de modelos que utilizam essa peça %>
+            <td><%= peca.motorcycle_models.count %></td>
+
+            <%# Ações disponíveis para cada peça: ver, editar ou excluir %>
+            <td>
+              <%= link_to "Ver", admin_part_path(peca), class: "btn btn-sm btn-info" %>
+              <%= link_to "Editar", edit_admin_part_path(peca), class: "btn btn-sm btn-warning" %>
+              <%= button_to "Excluir", admin_part_path(peca), method: :delete,
+                  data: { confirm: "Tem certeza?" },
+                  class: "btn btn-sm btn-danger" %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+
+<% else %>
+  <!-- Caso não existam peças cadastradas -->
+  <div class="alert alert-info">
+    Nenhuma peça cadastrada.
+    <%= link_to "Cadastre a primeira peça", new_admin_part_path %>
+  </div>
+<% end %>
