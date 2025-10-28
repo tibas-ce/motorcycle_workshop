@@ -1,0 +1,101 @@
+<!-- Página de detalhes de Agendamentos -->
+
+<h1>Todos os Agendamentos</h1>
+
+<div class="row mt-4">
+  <div class="col-md-12">
+    <%# Abas de navegação para filtrar os agendamentos por status %>
+    <ul class="nav nav-tabs">
+      <li class="nav-item">
+        <%= link_to "Todos", admin_schedulings_path, class: "nav-link #{params[:status].blank? ? 'active' : ''}" %>
+      </li>
+      <li class="nav-item">
+        <%= link_to "Pendentes", admin_schedulings_path(status: 'pendente'), class: "nav-link #{params[:status] == 'pendente' ? 'active' : ''}" %>
+      </li>
+      <li class="nav-item">
+        <%= link_to "Confirmados", admin_schedulings_path(status: 'confirmado'), class: "nav-link #{params[:status] == 'confirmado' ? 'active' : ''}" %>
+      </li>
+      <li class="nav-item">
+        <%= link_to "Realizados", admin_schedulings_path(status: 'realizado'), class: "nav-link #{params[:status] == 'realizado' ? 'active' : ''}" %>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="card mt-3">
+  <div class="card-body">
+    <%# Verifica se existem agendamentos cadastrados %>
+    <% if @schedulings.any? %>
+      <div class="table-responsive">
+        <%# Tabela com informações detalhadas dos agendamentos %>
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th>Data/Hora</th>
+              <th>Cliente</th>
+              <th>Moto</th>
+              <th>Tipo</th>
+              <th>KM</th>
+              <th>Status</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% @schedulings.each do |agendamento| %>
+              <tr>
+                <%# Data e hora do agendamento %>
+                <td><%= l(agendamento.scheduled_time_date, format: :short) %></td>
+
+                <%# Informações do cliente associado ao agendamento %>
+                <td>
+                  <%= agendamento.user.name %><br>
+                  <small class="text-muted"><%= agendamento.user.phone_number %></small>
+                </td>
+
+                <%# Informações da motocicleta vinculada ao agendamento %>
+                <td>
+                  <%= agendamento.moto.modelo_moto.nome %><br>
+                  <small class="text-muted"><%= agendamento.motorcycle.license_plate %></small>
+                </td>
+
+                <%# Exibição do tipo de serviço (garantia ou normal) %>
+                <td>
+                  <% if agendamento.service_type == 'garantia' %>
+                    <span class="badge bg-success">Garantia</span>
+                  <% else %>
+                    <span class="badge bg-primary">Normal</span>
+                  <% end %>
+                </td>
+
+                <%# Quilometragem registrada no momento do agendamento %>
+                <td><%= number_with_delimiter(agendamento.current_scheduling_km) %></td>
+
+                <%# Status atual do agendamento, com destaque visual por cor %>
+                <td>
+                  <% case agendamento.status %>
+                  <% when 'pendente' %>
+                    <span class="badge bg-warning text-dark">Pendente</span>
+                  <% when 'confirmado' %>
+                    <span class="badge bg-info">Confirmado</span>
+                  <% when 'realizado' %>
+                    <span class="badge bg-success">Realizado</span>
+                  <% when 'cancelado' %>
+                    <span class="badge bg-danger">Cancelado</span>
+                  <% end %>
+                </td>
+
+                <%# Ações disponíveis para cada agendamento (ex: visualizar detalhes) %>
+                <td>
+                  <%= link_to "Ver", admin_scheduling_path(agendamento), class: "btn btn-sm btn-info" %>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    <% else %>
+      <%# Mensagem exibida caso não existam agendamentos cadastrados %>
+      <p class="text-muted">Nenhum agendamento encontrado.</p>
+    <% end %>
+  </div>
+</div>
