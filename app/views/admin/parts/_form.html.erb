@@ -1,0 +1,77 @@
+<!-- Formulário para criar ou editar uma peça -->
+<%= form_with(model: [:admin, part], local: true) do |form| %>
+
+  <%# Se houver erros de validação, exibe-os em um alerta visual %>
+  <% if part.errors.any? %>
+    <div class="alert alert-danger">
+      <h5><%= pluralize(part.errors.count, "erro") %> impediram o salvamento:</h5>
+      <ul class="mb-0">
+        <% part.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <!-- Campo: Nome da peça -->
+  <div class="mb-3">
+    <%= form.label :name, "Nome da Peça", class: "form-label" %>
+    <%= form.text_field :name, class: "form-control", placeholder: "Ex: Óleo Motor 20W50" %>
+  </div>
+
+  <!-- Campos em duas colunas: Código Original e Categoria -->
+  <div class="row">
+    <div class="col-md-6 mb-3">
+      <%= form.label :original_code, "Código Original", class: "form-label" %>
+      <%= form.text_field :original_code, class: "form-control", placeholder: "RE-OL-001" %>
+    </div>
+
+    <div class="col-md-6 mb-3">
+      <%= form.label :category, "Categoria", class: "form-label" %>
+
+      <%# Campo de seleção com opções fixas para categorias de peças %>
+      <%# A repetição ['Motor', 'Motor'] é porque o Rails permite separar label (visível) e valor enviado ao back-end. %>
+      <%= form.select :category,
+          options_for_select([
+            ['Motor', 'motor'],
+            ['Transmissão', 'transmissão'],
+            ['Freio', 'freio'],
+            ['Suspensão', 'suspensão'],
+            ['Elétrica', 'elétrica'],
+            ['Carroceria', 'carroceria'],
+            ['Outras', 'outras']
+          ], part.category),
+          { include_blank: 'Selecione uma categoria' },
+          { class: "form-select" } %>
+    </div>
+  </div>
+
+  <!-- Campos em duas colunas: Preço e Estoque -->
+  <div class="row">
+    <div class="col-md-6 mb-3">
+      <%= form.label :price, "Preço (R$)", class: "form-label" %>
+      <%= form.number_field :price, class: "form-control", step: 0.01, min: 0, placeholder: "0.00" %>
+    </div>
+
+    <div class="col-md-6 mb-3">
+      <%= form.label :stock, "Estoque", class: "form-label" %>
+
+      <%# Define o valor inicial como o estoque atual ou 0 caso seja um novo registro %>
+      <%= form.number_field :stock, class: "form-control", min: 0, value: part.stock || 0 %>
+    </div>
+  </div>
+
+  <!-- Campo de descrição -->
+  <div class="mb-3">
+    <%= form.label :description, "Descrição", class: "form-label" %>
+    <%= form.text_area :description, class: "form-control", rows: 4,
+        placeholder: "Descrição detalhada da peça, compatibilidades, especificações técnicas..." %>
+  </div>
+
+  <!-- Botões de ação -->
+  <div class="mt-4">
+    <%= form.submit "Salvar Peça", class: "btn btn-primary" %>
+    <%= link_to "Cancelar", admin_parts_path, class: "btn btn-secondary" %>
+  </div>
+
+<% end %>
