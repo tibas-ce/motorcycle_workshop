@@ -1,2 +1,157 @@
-<h1>Admin::Parts#show</h1>
-<p>Find me in app/views/admin/parts/show.html.erb</p>
+<!-- Página de exibição de detalhes de uma peça no painel administrativo -->
+
+<div class="row">
+  <div class="col-md-8">
+    <!-- Nome principal da peça -->
+    <h1><%= @part.name %></h1>
+    
+    <!-- Card com informações gerais da peça -->
+    <div class="card mb-4">
+      <div class="card-header">
+        <h5>Informações da Peça</h5>
+      </div>
+
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-6">
+            <p><strong>Código Original:</strong> <code><%= @part.original_code %></code></p>
+
+            <%# Exibe a categoria ou informa que não foi definida %>
+            <p><strong>Categoria:</strong> 
+              <% if @part.category.present? %>
+                <span class="badge bg-info"><%= @part.category %></span>
+              <% else %>
+                <span class="text-muted">Não definida</span>
+              <% end %>
+            </p>
+          </div>
+
+          <div class="col-md-6">
+            <%# Exibe o preço formatado e o estoque com cor condicional %>
+            <p><strong>Preço:</strong> R$ <%= number_to_currency(@part.price, unit: "", precision: 2) %></p>
+            <p><strong>Estoque:</strong> 
+              <% if @part.stock > 10 %>
+                <span class="badge bg-success"><%= @part.stock %> unidades</span>
+              <% elsif @part.stock > 0 %>
+                <span class="badge bg-warning"><%= @part.stock %> unidades</span>
+              <% else %>
+                <span class="badge bg-danger">Sem estoque</span>
+              <% end %>
+            </p>
+          </div>
+        </div>
+        
+        <%# Exibe a descrição apenas se houver conteúdo %>
+        <% if @part.description.present? %>
+          <hr>
+          <p><strong>Descrição:</strong><br>
+            <%= simple_format(@part.description) %>
+          </p>
+        <% end %>
+        
+        <!-- Botões de ação -->
+        <div class="mt-3">
+          <%= link_to "Editar", edit_admin_part_path(@part), class: "btn btn-warning" %>
+          <%= link_to "Voltar", admin_parts_path, class: "btn btn-secondary" %>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Seção com os modelos compatíveis -->
+    <div class="card">
+      <div class="card-header">
+        <h5>Modelos Compatíveis</h5>
+      </div>
+
+      <div class="card-body">
+        <%# Verifica se a peça está vinculada a algum modelo %>
+        <% if @models.any? %>
+          <!-- Tabela de modelos compatíveis -->
+          <div class="table-responsive">
+            <table class="table table-sm">
+              <thead>
+                <tr>
+                  <th>Modelo</th>
+                  <th>Obrigatória</th>
+                  <th>KM Troca</th>
+                </tr>
+              </thead>
+              <tbody>
+                <%# Percorre os vínculos entre a peça e os modelos %>
+                <% @part.model_parts.includes(:motorcycle_model).each do |mp| %>
+                  <tr>
+                    <td><%= link_to mp.motorcycle_model.name, admin_motorcycle_model_path(mp.motorcycle_model) %></td>
+
+                    <%# Mostra se a peça é obrigatória na revisão %>
+                    <td>
+                      <% if mp.obrigatoria_revisao %>
+                        <span class="badge bg-warning">Sim</span>
+                      <% else %>
+                        <span class="badge bg-secondary">Não</span>
+                      <% end %>
+                    </td>
+
+                    <%# Mostra o km de troca se existir %>
+                    <td>
+                      <% if mp.km_replacement.present? %>
+                        <%= number_with_delimiter(mp.km_replacement) %> km
+                      <% else %>
+                        -
+                      <% end %>
+                    </td>
+                  </tr>
+                <% end %>
+              </tbody>
+            </table>
+          </div>
+        <% else %>
+          <!-- Caso a peça não esteja associada a nenhum modelo -->
+          <p class="text-muted">Esta peça ainda não está vinculada a nenhum modelo.</p>
+        <% end %>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Coluna lateral com estatísticas e ajuste rápido de estoque -->
+  <div class="col-md-4">
+    <!-- Card de estatísticas -->
+    <div class="card">
+      <div class="card-header">
+        <h5>Estatísticas</h5>
+      </div>
+
+      <div class="card-body">
+        <p><strong>Modelos Compatíveis:</strong> <%= @models.count %></p>
+        <p><strong>Utilizada em Revisões:</strong> <%= @part.review_parts.count %></p>
+
+        <%# Exibe status conforme disponibilidade da peça %>
+        <p class="mb-0"><strong>Status:</strong> 
+          <% if @part.disponivel? %>
+            <span class="badge bg-success">Disponível</span>
+          <% else %>
+            <span class="badge bg-danger">Sem Estoque</span>
+          <% end %>
+        </p>
+      </div>
+    </div>
+    
+    <!-- Card de ajuste rápido de estoque -->
+    <div class="card mt-3">
+      <div class="card-header">
+        <h5>Ajuste Rápido de Estoque</h5>
+      </div>
+
+      <div class="card-body">
+        <%# Formulário para atualizar o estoque diretamente %>
+        <%= form_with(url: admin_part_path(@part), method: :patch, local: true) do |f| %>
+          <div class="mb-3">
+            <%= f.label :stock, "Novo Estoque", class: "form-label" %>
+            <%= f.number_field :stock, value: @part.stock, class: "form-control", min: 0 %>
+          </div>
+
+          <%= f.submit "Atualizar Estoque", class: "btn btn-primary btn-sm w-100" %>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>
