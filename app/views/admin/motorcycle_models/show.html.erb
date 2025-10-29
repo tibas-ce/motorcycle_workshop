@@ -56,7 +56,7 @@
       </div>
       <div class="card-body">
         <%# Verifica se o modelo possui peças vinculadas %>
-        <% if @parts_linked.any? %>
+        <% if @linked_parts&.any? %>
           <div class="table-responsive">
             <table class="table">
               <thead>
