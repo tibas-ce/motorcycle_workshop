@@ -1,34 +1,18 @@
 Rails.application.routes.draw do
-  get "schendulings/index"
-  get "schendulings/show"
-  get "schendulings/new"
-  get "schendulings/create"
-  get "schendulings/destroy"
-  get "motorcycles/index"
-  get "motorcycles/show"
-  get "motorcycles/new"
-  get "motorcycles/create"
-  get "motorcycles/edit"
-  get "motorcycles/update"
-  get "motorcycles/destroy"
-  get "home/index"
-  # Rotas geradas automaticamente pelo Devise para autenticação de usuários
-  devise_for :users
-
-  # get "up" => "rails/health#show", as: :rails_health_check
-  # root "posts#index"
-
   # Define a página inicial do sistema (HomeController#index)
   root "home#index"
+
+  # Rotas geradas automaticamente pelo Devise para autenticação de usuários
+  devise_for :users
 
   # Rotas para Clientes
   # As rotas de clientes estão focadas no gerenciamento de motocicletas e no agendamento de serviços.
   resources :motorcycles do
     # Rotas aninhadas: permitem criar agendamentos dentro do contexto de uma moto específica.
-    resources :scheduling, only: [ :new, :create ]
+    resources :schedulings, only: [ :new, :create ]
   end
   # Rotas adicionais para visualizar, listar e cancelar agendamentos.
-  resources :scheduling, only: [ :index, :show, :destroy ] do
+  resources :schedulings, only: [ :index, :show, :destroy ] do
     # Rota customizada: PATCH /scheduling/:id/cancelar
     # Permite cancelar um agendamento já criado.
     member do
@@ -38,19 +22,11 @@ Rails.application.routes.draw do
 
   # Rotas para Mecânico
   # As rotas dentro do namespace "mechanic" geram caminhos e controladores com o prefixo mechanic/, como mechanic/scheduling#index.
-  namespace :mechanic do
-    get "reviews/index"
-    get "reviews/show"
-    get "reviews/new"
-    get "reviews/create"
-    get "reviews/edit"
-    get "reviews/update"
-    get "schendulings/index"
-    get "schendulings/show"
+  namespace :mechanics do
     # Painel principal do mecânico
     get "dashboard", to: "dashboard#index"
     # Listagem e visualização de agendamentos atribuídos ao mecânico.
-    resources :scheduling, only: [ :index, :show ] do
+    resources :schedulings, only: [ :index, :show ] do
       # PATCH /mechanic/scheduling/:id/confirmar
       # Permite ao mecânico confirmar o agendamento de um serviço.
       member do
@@ -72,32 +48,10 @@ Rails.application.routes.draw do
   # Rotas para Admin
   # O namespace "admin" organiza rotas específicas de administração, geralmente com permissões exclusivas.
   namespace :admin do
-    get "mechanics/index"
-    get "mechanics/show"
-    get "mechanics/new"
-    get "mechanics/create"
-    get "mechanics/edit"
-    get "mechanics/update"
-    get "mechanics/destroy"
-    get "parts/index"
-    get "parts/show"
-    get "parts/new"
-    get "parts/create"
-    get "parts/edit"
-    get "parts/update"
-    get "parts/destroy"
-    get "motorcycle_models/index"
-    get "motorcycle_models/show"
-    get "motorcycle_models/new"
-    get "motorcycle_models/create"
-    get "motorcycle_models/edit"
-    get "motorcycle_models/update"
-    get "motorcycle_models/destroy"
-    get "dashboard/index"
     # Painel principal do administrador.
     get "dashboard", to: "dashboard#index"
     # Gerenciamento dos modelos de motocicletas.
-    resources :motorcycle_model do
+    resources :motorcycle_models do
       # Permite adicionar ou remover peças relacionadas a um modelo.
       resources :model_parts, only: [ :create, :destroy ]
     end
