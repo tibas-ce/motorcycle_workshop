@@ -146,7 +146,7 @@
           <div class="mb-3">
             <%= form.label :part_id, "Peça", class: "form-label" %>
             <%= form.collection_select :part_id, 
-                @pecas_disponiveis, :id, :name,
+                @available_parts || [], :id, :name,
                 { prompt: "Selecione uma peça" },
                 { class: "form-select" } %>
           </div>
@@ -154,8 +154,8 @@
           <!-- Checkbox para marcar se é obrigatória -->
           <div class="mb-3">
             <div class="form-check">
-              <%= form.check_box :obrigatoria_revisao, class: "form-check-input" %>
-              <%= form.label :obrigatoria_revisao, "Obrigatória na revisão?", class: "form-check-label" %>
+              <%= form.check_box :mandatory_review, class: "form-check-input" %>
+              <%= form.label :mandatory_review, "Obrigatória na revisão?", class: "form-check-label" %>
             </div>
           </div>
           
