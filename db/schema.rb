@@ -23,14 +23,14 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_14_205110) do
   end
 
   create_table "model_parts", force: :cascade do |t|
-    t.integer "model_motorcycle_id", null: false
+    t.integer "motorcycle_model_id", null: false
     t.integer "part_id", null: false
     t.boolean "mandatory_review", default: false
     t.integer "km_replacement"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["model_motorcycle_id", "part_id"], name: "index_model_parts_on_model_motorcycle_id_and_part_id", unique: true
-    t.index ["model_motorcycle_id"], name: "index_model_parts_on_model_motorcycle_id"
+    t.index ["motorcycle_model_id", "part_id"], name: "index_model_parts_on_motorcycle_model_id_and_part_id", unique: true
+    t.index ["motorcycle_model_id"], name: "index_model_parts_on_motorcycle_model_id"
     t.index ["part_id"], name: "index_model_parts_on_part_id"
   end
 
@@ -150,7 +150,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_14_205110) do
   end
 
   add_foreign_key "mechanics", "users"
-  add_foreign_key "model_parts", "model_motorcycles"
+  add_foreign_key "model_parts", "motorcycle_models"
   add_foreign_key "model_parts", "parts"
   add_foreign_key "motorcycles", "motorcycle_models"
   add_foreign_key "motorcycles", "users"
