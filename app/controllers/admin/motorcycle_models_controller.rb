@@ -29,7 +29,7 @@ class Admin::MotorcycleModelsController < ApplicationController
   # POST /admin/motorcycle_models
   # Cria um novo modelo de motocicleta com os parâmetros informados.
   def create
-    @motorcycle_model = MotorcycleModel.new(modelo_moto_params)
+    @motorcycle_model = MotorcycleModel.new(motorcycle_model_params)
 
     if @motorcycle_model.save
       redirect_to admin_motorcycle_model_path(@motorcycle_model), notice: "Modelo cadastrado com sucesso!"

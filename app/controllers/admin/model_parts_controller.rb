@@ -10,7 +10,7 @@ class Admin::ModelPartsController < Admin::BaseController
   # Caso o vínculo seja salvo com sucesso, redireciona de volta à página do modelo.
   # Caso contrário, exibe uma mensagem de erro.
   def create
-    @model_part = @motorcycle_model.model_parts.build(model_part_params)
+    @model_part = @motorcycle_model.model_parts.new (model_part_params)
 
     if @model_part.save
       redirect_to admin_motorcycle_model_path(@motorcycle_model), notice: "Peça vinculada ao modelo!"

@@ -17,7 +17,7 @@ class User < ApplicationRecord
   has_many :schedulings, dependent: :destroy
   # Um usuário pode ter um mecânico associado (caso seja um usuário do tipo "mecânico").
   # O registro do mecânico é excluído se o usuário for removido.
-  has_one :mechanics, dependent: :destroy
+  has_one :mechanic, dependent: :destroy
 
   # Validações de presença — exige que o nome e o papel (role) sejam informados.
   validates :name, :role, presence: true

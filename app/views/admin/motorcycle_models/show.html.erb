@@ -56,7 +56,7 @@
       </div>
       <div class="card-body">
         <%# Verifica se o modelo possui peças vinculadas %>
-        <% if @parts_linked.any? %>
+        <% if @linked_parts&.any? %>
           <div class="table-responsive">
             <table class="table">
               <thead>
@@ -79,7 +79,7 @@
 
                     <td>
                       <%# Exibe se a peça é obrigatória ou opcional %>
-                      <% if mp.obrigatoria_revisao %>
+                      <% if mp.mandatory_review %>
                         <span class="badge bg-warning">Obrigatória</span>
                       <% else %>
                         <span class="badge bg-secondary">Opcional</span>
@@ -123,9 +123,9 @@
       </div>
       <div class="card-body">
         <p><strong>Motos Cadastradas:</strong> <%= @motorcycle_model.motorcycles.count %></p>
-        <p><strong>Peças Vinculadas:</strong> <%= @parts_linked.count %></p>
+        <p><strong>Peças Vinculadas:</strong> <%= @linked_parts.count %></p>
         <p class="mb-0"><strong>Peças Obrigatórias:</strong> 
-          <%= @motorcycle_model.model_parts.where(obrigatoria_revisao: true).count %></p>
+          <%= @motorcycle_model.model_parts.where(mandatory_review: true).count %></p>
       </div>
     </div>
   </div>
@@ -136,7 +136,7 @@
   <div class="modal-dialog">
     <div class="modal-content">
       <%# Formulário para vincular uma peça ao modelo %>
-      <%= form_with(url: admin_motorcycle_model_model_parts_path(@motorcycle_model), local: true) do |form| %>
+      <%= form_with(model: [ :admin, @motorcycle_model, ModelPart.new ], local: true) do |form| %>
         <div class="modal-header">
           <h5 class="modal-title">Vincular Peça ao Modelo</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
@@ -146,7 +146,7 @@
           <div class="mb-3">
             <%= form.label :part_id, "Peça", class: "form-label" %>
             <%= form.collection_select :part_id, 
-                @pecas_disponiveis, :id, :name,
+                @available_parts || [], :id, :name,
                 { prompt: "Selecione uma peça" },
                 { class: "form-select" } %>
           </div>
@@ -154,8 +154,8 @@
           <!-- Checkbox para marcar se é obrigatória -->
           <div class="mb-3">
             <div class="form-check">
-              <%= form.check_box :obrigatoria_revisao, class: "form-check-input" %>
-              <%= form.label :obrigatoria_revisao, "Obrigatória na revisão?", class: "form-check-label" %>
+              <%= form.check_box :mandatory_review, class: "form-check-input" %>
+              <%= form.label :mandatory_review, "Obrigatória na revisão?", class: "form-check-label" %>
             </div>
           </div>
           
