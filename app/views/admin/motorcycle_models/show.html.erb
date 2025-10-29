@@ -123,9 +123,9 @@
       </div>
       <div class="card-body">
         <p><strong>Motos Cadastradas:</strong> <%= @motorcycle_model.motorcycles.count %></p>
-        <p><strong>Peças Vinculadas:</strong> <%= @parts_linked.count %></p>
+        <p><strong>Peças Vinculadas:</strong> <%= @linked_parts.count %></p>
         <p class="mb-0"><strong>Peças Obrigatórias:</strong> 
-          <%= @motorcycle_model.model_parts.where(obrigatoria_revisao: true).count %></p>
+          <%= @motorcycle_model.model_parts.where(mandatory_review: true).count %></p>
       </div>
     </div>
   </div>
