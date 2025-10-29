@@ -4,7 +4,7 @@
 # Cada peça pode estar associada a vários modelos de moto e também a avaliações (reviews) específicas.
 class Part < ApplicationRecord
   # Associação: conecta a peça à tabela intermediária ModelPart, que define quais modelos de motocicleta são compatíveis com esta peça.
-  has_many :model_parts
+  has_many :model_parts, dependent: :destroy
   # Associação: permite acessar os modelos de motocicleta que utilizam esta peça através do relacionamento com ModelPart.
   has_many :motorcycle_models, through: :model_parts
   # Associação: conecta a peça às suas avaliações (reviews) através da tabela intermediária ReviewPart.
