@@ -136,7 +136,7 @@
   <div class="modal-dialog">
     <div class="modal-content">
       <%# Formulário para vincular uma peça ao modelo %>
-      <%= form_with(url: admin_motorcycle_model_model_parts_path(@motorcycle_model), local: true) do |form| %>
+      <%= form_with(model: [ :admin, @motorcycle_model, ModelPart.new ], local: true) do |form| %>
         <div class="modal-header">
           <h5 class="modal-title">Vincular Peça ao Modelo</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
