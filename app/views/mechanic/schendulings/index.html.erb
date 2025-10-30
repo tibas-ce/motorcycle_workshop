@@ -1,2 +1,123 @@
-<h1>Mechanic::Schendulings#index</h1>
-<p>Find me in app/views/mechanic/schendulings/index.html.erb</p>
+<h1>Agendamentos</h1>
+
+<!-- Navegação entre filtros de agendamentos -->
+<div class="row mt-4">
+  <div class="col-md-12">
+    <ul class="nav nav-tabs">
+      <li class="nav-item">
+        <%= link_to "Todos", mechanic_schedulings_path, 
+            class: "nav-link #{params[:filtro].blank? ? 'active' : ''}" %>
+      </li>
+      <li class="nav-item">
+        <%= link_to "Hoje", mechanic_schedulings_path(filtro: 'hoje'), 
+            class: "nav-link #{params[:filtro] == 'hoje' ? 'active' : ''}" %>
+      </li>
+      <li class="nav-item">
+        <%= link_to "Esta Semana", mechanic_schedulings_path(filtro: 'semana'), 
+            class: "nav-link #{params[:filtro] == 'semana' ? 'active' : ''}" %>
+      </li>
+      <li class="nav-item">
+        <%= link_to "Pendentes", mechanic_schedulings_path(filtro: 'pendentes'), 
+            class: "nav-link #{params[:filtro] == 'pendentes' ? 'active' : ''}" %>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<!-- Tabela de listagem de agendamentos -->
+<div class="card mt-3">
+  <div class="card-body">
+    <% if @schedulings.any? %>
+      <div class="table-responsive">
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th>Data/Hora</th>
+              <th>Cliente</th>
+              <th>Contato</th>
+              <th>Moto</th>
+              <th>Tipo</th>
+              <th>KM</th>
+              <th>Status</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% @schedulings.each do |agendamento| %>
+              <!-- Destaca o agendamento do dia -->
+              <tr class="<%= 'table-warning' if agendamento.scheduled_time_date.to_date == Date.today %>">
+                <!-- Data e horário -->
+                <td>
+                  <%= l(agendamento.scheduled_time_date, format: :short) %>
+                  <% if agendamento.scheduled_time_date.to_date == Date.today %>
+                    <br><span class="badge bg-warning text-dark">Hoje</span>
+                  <% end %>
+                </td>
+                <!-- Cliente -->
+                <td><%= agendamento.user.name %></td>
+                <!-- Contato -->
+                <td>
+                  <%= agendamento.user.phone_number %><br>
+                  <small class="text-muted"><%= agendamento.user.email %></small>
+                </td>
+                <!-- Moto -->
+                <td>
+                  <strong><%= agendamento.motorcycle.motorcycle_model.name %></strong><br>
+                  <small class="text-muted">
+                    <%= agendamento.motorcycle.license_plate %> | 
+                    <%= agendamento.motorcycle.color %>
+                  </small>
+                </td>
+                <!-- Tipo de serviço -->
+                <td>
+                  <% if agendamento.service_type == 'garantia' %>
+                    <span class="badge bg-success">Garantia</span>
+                  <% else %>
+                    <span class="badge bg-primary">Normal</span>
+                  <% end %>
+                </td>
+                <!-- Quilometragem -->
+                <td><%= number_with_delimiter(agendamento.current_scheduling_km) %></td>
+                <!-- Status -->
+                <td>
+                  <% case agendamento.status %>
+                  <% when 'pendente' %>
+                    <span class="badge bg-warning text-dark">Pendente</span>
+                  <% when 'confirmado' %>
+                    <span class="badge bg-info">Confirmado</span>
+                  <% when 'realizado' %>
+                    <span class="badge bg-success">Realizado</span>
+                  <% when 'cancelado' %>
+                    <span class="badge bg-danger">Cancelado</span>
+                  <% end %>
+                </td>
+                <!-- Ações disponíveis -->
+                <td>
+                  <div class="btn-group btn-group-sm" role="group">
+                    <%= link_to "Ver", mechanic_schedulings_path(agendamento), 
+                        class: "btn btn-info", title: "Ver detalhes" %>
+                    
+                    <% if agendamento.status == 'pendente' %>
+                      <%= button_to "Confirmar", confirm_mechanic_schedulings_path(agendamento), 
+                          method: :patch,
+                          class: "btn btn-success",
+                          title: "Confirmar agendamento" %>
+                    <% end %>
+                    
+                    <% if agendamento.status == 'confirmado' %>
+                      <%= link_to "Iniciar", new_mechanic_review_path(scheduling_id: agendamento.id), 
+                          class: "btn btn-primary",
+                          title: "Iniciar revisão" %>
+                    <% end %>
+                  </div>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    <% else %>
+      <p class="text-muted">Nenhum agendamento encontrado para este filtro.</p>
+    <% end %>
+  </div>
+</div>
