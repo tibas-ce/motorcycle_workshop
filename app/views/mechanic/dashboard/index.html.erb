@@ -1,2 +1,150 @@
-<h1>Mechanic::Dashboard#index</h1>
-<p>Find me in app/views/mechanic/dashboard/index.html.erb</p>
+<h1>Dashboard - <%= current_user.mechanic.name %></h1>
+<%# Exibe o número de registro profissional do mecânico logado %>
+<p class="text-muted">Registro: <%= current_user.mechanic.professional_registration %></p>
+<%# Seção com os cards de resumo rápido (revisões, agendamentos, etc.) %>
+<div class="row mt-4">
+  <div class="col-md-3">
+    <div class="card text-white bg-warning">
+      <div class="card-body">
+        <h5 class="card-title">Revisões em Andamento</h5>
+        <h2><%= @reviews_in_progress %></h2>
+        <%= link_to "Ver Todas", mechanic_reviews_path, class: "btn btn-light btn-sm" %>
+      </div>
+    </div>
+  </div>
+  <%# Card de agendamentos do dia %>
+  <div class="col-md-3">
+    <div class="card text-white bg-info">
+      <div class="card-body">
+        <h5 class="card-title">Agendamentos Hoje</h5>
+        <h2><%= @schedulings_today %></h2>
+        <%= link_to "Ver Agendamentos", mechanic_schedulings_path, class: "btn btn-light btn-sm" %>
+      </div>
+    </div>
+  </div>
+  <%# Card de revisões concluídas %>
+  <div class="col-md-3">
+    <div class="card text-white bg-success">
+      <div class="card-body">
+        <h5 class="card-title">Revisões Concluídas</h5>
+        <h2><%= @completed_reviews %></h2>
+      </div>
+    </div>
+  </div>
+  <%# Card com o total ganho no mês atual %>
+  <div class="col-md-3">
+    <div class="card text-white bg-primary">
+      <div class="card-body">
+        <h5 class="card-title">Total Este Mês</h5>
+        <h2>R$ <%= number_to_currency(@total_month, unit: "", precision: 2) %></h2>
+      </div>
+    </div>
+  </div>
+</div>
+<%# Seção inferior: próximos agendamentos e estatísticas pessoais %>
+<div class="row mt-4">
+  <%# Coluna principal com a lista dos próximos agendamentos %>  
+  <div class="col-md-8">
+    <div class="card">
+      <div class="card-header">
+        <h5>Próximos Agendamentos</h5>
+      </div>
+      <div class="card-body">
+        <%# Caso haja agendamentos futuros %>
+        <% if @next_schedulings.any? %>
+          <div class="table-responsive">
+            <table class="table table-hover">
+              <thead>
+                <tr>
+                  <th>Data/Hora</th>
+                  <th>Cliente</th>
+                  <th>Moto</th>
+                  <th>Tipo</th>
+                  <th>Status</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody>
+                <%# Itera sobre os agendamentos próximos %>
+                <% @next_schedulings.each do |agendamento| %>
+                  <tr>
+                    <td>
+                      <%= l(agendamento.scheduled_time_date, format: :short) %>
+                    </td>
+                    <td>
+                      <%= agendamento.user.name %><br>
+                      <small class="text-muted"><%= agendamento.user.phone_number %></small>
+                    </td>
+                    <td>
+                      <%= agendamento.motorcycle.motorcycle_model.name %><br>
+                      <small class="text-muted"><%= agendamento.motorcycle.license_plate %></small>
+                    </td>
+                    <td>
+                      <%# Exibe o tipo de serviço (garantia ou normal) %>
+                      <% if agendamento.service_type == 'garantia' %>
+                        <span class="badge bg-success">Garantia</span>
+                      <% else %>
+                        <span class="badge bg-primary">Normal</span>
+                      <% end %>
+                    </td>
+                    <td>
+                      <%# Exibe o status atual do agendamento %>
+                      <% case agendamento.status %>
+                      <% when 'pendente' %>
+                        <span class="badge bg-warning text-dark">Pendente</span>
+                      <% when 'confirmado' %>
+                        <span class="badge bg-info">Confirmado</span>
+                      <% end %>
+                    </td>
+                    <td>
+                      <%# Botões de ação: ver detalhes ou iniciar revisão %>
+                      <%= link_to "Ver", mechanic_scheduling_path(agendamento), class: "btn btn-sm btn-info" %>
+                      <% if agendamento.status == 'confirmado' %>
+                        <%= link_to "Iniciar Revisão", new_mechanic_review_path(agendamento_id: agendamento.id), 
+                            class: "btn btn-sm btn-success" %>
+                      <% end %>
+                    </td>
+                  </tr>
+                <% end %>
+              </tbody>
+            </table>
+          </div>
+        <%# Caso não haja agendamentos futuros %>  
+        <% else %>
+          <p class="text-muted">Nenhum agendamento próximo.</p>
+        <% end %>
+      </div>
+    </div>
+  </div>
+  
+  <%# Coluna lateral direita com estatísticas e ações rápidas %>
+  <div class="col-md-4">
+    <%# Card com estatísticas do mecânico %>
+    <div class="card">
+      <div class="card-header">
+        <h5>Minhas Estatísticas</h5>
+      </div>
+      <div class="card-body">
+        <p><strong>Total de Revisões:</strong> <%= @total_reviews %></p>
+        <p><strong>Revisões Este Mês:</strong> <%= @reviews_month %></p>
+        <p><strong>Média de Valor:</strong> R$ <%= number_to_currency(@average_value, unit: "", precision: 2) %></p>
+        <p class="mb-0"><strong>Especialidade:</strong><br>
+          <%= current_user.mechanic.specialty || 'Não definida' %>
+        </p>
+      </div>
+    </div>
+    
+    <%# Card com atalhos de navegação para ações rápidas %>
+    <div class="card mt-3">
+      <div class="card-header">
+        <h5>Ações Rápidas</h5>
+      </div>
+      <div class="card-body">
+        <div class="d-grid gap-2">
+          <%= link_to "Ver Todos os Agendamentos", mechanic_schedulings_path, class: "btn btn-primary" %>
+          <%= link_to "Minhas Revisões", mechanic_reviews_path, class: "btn btn-success" %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
