@@ -1,2 +1,184 @@
-<h1>Mechanic::Reviews#index</h1>
-<p>Find me in app/views/mechanic/reviews/index.html.erb</p>
+<%# == View: mechanic/reviews/index.html.erb %>
+<%# Página que exibe as revisões do mecânico, permitindo filtrar por status (em andamento, concluídas, aguardando peça, todas). %>
+
+<h1>Minhas Revisões</h1>
+
+<!-- Navegação por abas para filtragem de revisões -->
+<div class="row mt-4">
+  <div class="col-md-12">
+    <ul class="nav nav-tabs">
+      <li class="nav-item">
+        <%= link_to "Em Andamento", mechanic_reviews_path(filtro: 'em_andamento'), 
+            class: "nav-link #{params[:filtro] == 'em_andamento' || params[:filtro].blank? ? 'active' : ''}" %>
+      </li>
+      <li class="nav-item">
+        <%= link_to "Concluídas", mechanic_reviews_path(filtro: 'concluida'), 
+            class: "nav-link #{params[:filtro] == 'concluida' ? 'active' : ''}" %>
+      </li>
+      <li class="nav-item">
+        <%= link_to "Aguardando Peça", mechanic_reviews_path(filtro: 'aguardando_peca'), 
+            class: "nav-link #{params[:filtro] == 'aguardando_peca' ? 'active' : ''}" %>
+      </li>
+      <li class="nav-item">
+        <%= link_to "Todas", mechanic_reviews_path(filtro: 'todas'), 
+            class: "nav-link #{params[:filtro] == 'todas' ? 'active' : ''}" %>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="row mt-3">
+  <% if params[:filtro] == 'em_andamento' || params[:filtro].blank? %>
+    <!-- Exibição das revisões em andamento -->
+    <% if @reviews_in_progress.any? %>
+      <% @reviews_in_progress.each do |revisao| %>
+        <div class="col-md-6 mb-3">
+          <div class="card border-warning">
+            <div class="card-header bg-warning">
+              <div class="d-flex justify-content-between align-items-center">
+                <strong>
+                  <%= revisao.motorcycle.motorcycle_model.name %> - <%= revisao.motorcycle.license_plate %>
+                </strong>
+
+                <%# Exibe o tipo de revisão (Garantia ou Normal) %>
+                <% if revisao.service_type == 'garantia' %>
+                  <span class="badge bg-success">Garantia</span>
+                <% else %>
+                  <span class="badge bg-primary">Normal</span>
+                <% end %>
+              </div>
+            </div>
+
+            <div class="card-body">
+              <!-- Informações principais da revisão -->
+              <p>
+                <strong>Cliente:</strong> <%= revisao.motorcycle.user.name %><br>
+                <strong>Iniciada em:</strong> <%= l(revisao.start_date, format: :short) %><br>
+                <strong>KM:</strong> <%= number_with_delimiter(revisao.km_review) %> km<br>
+                <strong>Peças adicionadas:</strong> <%= revisao.review_parts.count %>
+              </p>
+              
+              <%# Indica se a revisão está aguardando peça %>
+              <% if revisao.status == 'aguardando_peca' %>
+                <div class="alert alert-info small mb-2">
+                  ⏳ Aguardando peças
+                </div>
+              <% end %>
+              
+              <!-- Ações disponíveis -->
+              <div class="d-flex gap-2">
+                <%= link_to "Ver Detalhes", mechanic_review_path(revisao), class: "btn btn-sm btn-info" %>
+                <%= link_to "Adicionar Peças", mechanic_review_path(revisao), class: "btn btn-sm btn-primary" %>
+                <%= button_to "Finalizar", finish_mechanic_review_path(revisao), 
+                    method: :patch,
+                    data: { confirm: "Tem certeza que deseja finalizar esta revisão?" },
+                    class: "btn btn-sm btn-success" %>
+              </div>
+            </div>
+          </div>
+        </div>
+      <% end %>
+    <% else %>
+      <!-- Caso não existam revisões em andamento -->
+      <div class="col-12">
+        <div class="alert alert-info">
+          Nenhuma revisão em andamento no momento.
+        </div>
+      </div>
+    <% end %>
+
+  <% else %>
+    <!-- Exibição de todas as revisões (em formato de tabela) -->
+    <div class="col-12">
+      <div class="card">
+        <div class="card-body">
+          <% if @completed_reviews.any? %>
+            <div class="table-responsive">
+              <table class="table table-hover">
+                <thead>
+                  <tr>
+                    <th>Data</th>
+                    <th>Cliente</th>
+                    <th>Moto</th>
+                    <th>KM</th>
+                    <th>Tipo</th>
+                    <th>Status</th>
+                    <th>Valor Total</th>
+                    <th>Ações</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <% @completed_reviews.each do |revisao| %>
+                    <tr>
+                      <!-- Data da revisão -->
+                      <td>
+                        <%= l(revisao.start_date, format: :short) %>
+                        <% if revisao.data_conclusao.present? %>
+                          <br><small class="text-muted">
+                            Concluída: <%= l(revisao.completion_date, format: :short) %>
+                          </small>
+                        <% end %>
+                      </td>
+
+                      <!-- Informações do cliente -->
+                      <td>
+                        <%= revisao.motorcycle.user.name %><br>
+                        <small class="text-muted"><%= revisao.motorcycle.user.phone_number %></small>
+                      </td>
+
+                      <!-- Dados da motocicleta -->
+                      <td>
+                        <strong><%= revisao.motorcycle.motorcycle_model.name %></strong><br>
+                        <small class="text-muted"><%= revisao.motorcycle.license_plate %></small>
+                      </td>
+
+                      <td><%= number_with_delimiter(revisao.km_review) %></td>
+
+                      <!-- Tipo de serviço -->
+                      <td>
+                        <% if revisao.service_type == 'garantia' %>
+                          <span class="badge bg-success">Garantia</span>
+                        <% else %>
+                          <span class="badge bg-primary">Normal</span>
+                        <% end %>
+                      </td>
+
+                      <!-- Status atual -->
+                      <td>
+                        <% case revisao.status %>
+                        <% when 'concluida' %>
+                          <span class="badge bg-success">Concluída</span>
+                        <% when 'em_andamento' %>
+                          <span class="badge bg-warning">Em Andamento</span>
+                        <% when 'aguardando_peca' %>
+                          <span class="badge bg-info">Aguardando Peça</span>
+                        <% end %>
+                      </td>
+
+                      <!-- Valores -->
+                      <td>
+                        <strong>R$ <%= number_to_currency(revisao.total_value, unit: "", precision: 2) %></strong>
+                        <% if revisao.service_type == 'garantia' %>
+                          <br><small class="text-muted">Mão de obra: Gratuita</small>
+                        <% else %>
+                          <br><small class="text-muted">Mão de obra: R$ <%= number_to_currency(revisao.labor_value, unit: "", precision: 2) %></small>
+                        <% end %>
+                      </td>
+
+                      <!-- Ações -->
+                      <td>
+                        <%= link_to "Ver", mechanic_review_path(revisao), class: "btn btn-sm btn-info" %>
+                      </td>
+                    </tr>
+                  <% end %>
+                </tbody>
+              </table>
+            </div>
+          <% else %>
+            <p class="text-muted">Nenhuma revisão encontrada para este filtro.</p>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  <% end %>
+</div>
