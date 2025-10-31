@@ -1,2 +1,335 @@
-<h1>Mechanic::Reviews#show</h1>
-<p>Find me in app/views/mechanic/reviews/show.html.erb</p>
+<%# == View: mechanic/reviews/show.html.erb %>
+<%# Página que exibe os detalhes completos de uma revisão específica, incluindo informações, peças utilizadas e resumo financeiro. %>
+
+<div class="row">
+  <div class="col-md-8">
+    <!-- Cabeçalho da revisão com status -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h1>Revisão #<%= @review.id %></h1>
+      <% case @review.status %>
+      <% when 'em_andamento' %>
+        <span class="badge bg-warning text-dark fs-5">Em Andamento</span>
+      <% when 'concluida' %>
+        <span class="badge bg-success fs-5">Concluída</span>
+      <% when 'aguardando_peca' %>
+        <span class="badge bg-info fs-5">Aguardando Peça</span>
+      <% end %>
+    </div>
+    
+    <!-- Informações gerais da revisão -->
+    <div class="card mb-4">
+      <div class="card-header">
+        <h5>Informações da Revisão</h5>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <!-- Coluna esquerda: informações do serviço -->
+          <div class="col-md-6">
+            <p>
+              <strong>Tipo:</strong>
+              <% if @review.service_type == 'garantia' %>
+                <span class="badge bg-success">Revisão de Garantia</span>
+              <% else %>
+                <span class="badge bg-primary">Revisão Normal</span>
+              <% end %>
+            </p>
+            
+            <p>
+              <strong>Data de Início:</strong><br>
+              <%= l(@review.start_date, format: :long) %>
+            </p>
+            
+            <% if @review.completion_date.present? %>
+              <p>
+                <strong>Data de Conclusão:</strong><br>
+                <%= l(@review.completion_date, format: :long) %>
+              </p>
+            <% end %>
+            
+            <p>
+              <strong>KM da Revisão:</strong><br>
+              <%= number_with_delimiter(@review.km_review) %> km
+            </p>
+          </div>
+          
+          <!-- Coluna direita: informações do cliente e motocicleta -->
+          <div class="col-md-6">
+            <p>
+              <strong>Cliente:</strong><br>
+              <%= @review.motorcycle.user.name %><br>
+              <small class="text-muted">
+                <%= @review.motorcycle.user.phone_number %><br>
+                <%= @review.motorcycle.user.email %>
+              </small>
+            </p>
+            
+            <p>
+              <strong>Moto:</strong><br>
+              <%= @review.motorcycle.motorcycle_model.name %><br>
+              <small class="text-muted">
+                Placa: <%= @review.motorcycle.license_plate %> | 
+                Ano: <%= @review.motorcycle.year_of_manufacture %>
+              </small>
+            </p>
+          </div>
+        </div>
+        
+        <%# Observações opcionais do mecânico e internas %>
+        <% if @review.mechanic_observations.present? %>
+          <hr>
+          <h6>Observações do Mecânico</h6>
+          <p><%= simple_format(@review.mechanic_observations) %></p>
+        <% end %>
+        
+        <% if @review.internal_observations.present? %>
+          <hr>
+          <h6>Observações Internas</h6>
+          <p><%= simple_format(@review.internal_observations) %></p>
+        <% end %>
+        
+        <% if @review.report.present? %>
+          <hr>
+          <h6>Laudo da Revisão</h6>
+          <p><%= simple_format(@review.report) %></p>
+        <% end %>
+        
+        <% if @review.status != 'concluida' %>
+          <hr>
+          <%= link_to "Editar Informações", edit_mechanic_review_path(@review), class: "btn btn-warning" %>
+        <% end %>
+      </div>
+    </div>
+    
+    <!-- Seção de peças utilizadas -->
+    <div class="card mb-4">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">Peças Utilizadas</h5>
+        <% if @review.status != 'concluida' %>
+          <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addPecaModal">
+            Adicionar Peça
+          </button>
+        <% end %>
+      </div>
+      <div class="card-body">
+        <% if @review_parts.any? %>
+          <div class="table-responsive">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Peça</th>
+                  <th>Código</th>
+                  <th>Qtd</th>
+                  <th>Valor Unit.</th>
+                  <th>Subtotal</th>
+                  <th>Garantia</th>
+                  <% if @review.status != 'concluida' %>
+                    <th>Ações</th>
+                  <% end %>
+                </tr>
+              </thead>
+              <tbody>
+                <% @review_parts.each do |rp| %>
+                  <tr>
+                    <td><%= rp.part.name %></td>
+                    <td><code><%= rp.part.original_code %></code></td>
+                    <td><%= rp.quantity %></td>
+                    <td>R$ <%= number_to_currency(rp.unit_price, unit: "", precision: 2) %></td>
+                    <td><strong>R$ <%= number_to_currency(rp.subtotal, unit: "", precision: 2) %></strong></td>
+                    <td>
+                      <% if rp.guarantee %>
+                        <span class="badge bg-success">Sim</span>
+                      <% else %>
+                        <span class="badge bg-secondary">Não</span>
+                      <% end %>
+                    </td>
+                    <% if @review.status != 'concluida' %>
+                      <td>
+                        <%= button_to "Remover", mechanic_review_review_part_path(@review, rp),
+                            method: :delete,
+                            data: { confirm: "Tem certeza que deseja remover esta peça?" },
+                            class: "btn btn-sm btn-danger" %>
+                      </td>
+                    <% end %>
+                  </tr>
+                <% end %>
+              </tbody>
+              <tfoot>
+                <tr class="table-secondary">
+                  <td colspan="4" class="text-end"><strong>Total em Peças:</strong></td>
+                  <td colspan="<%= @review.status != 'concluida' ? '3' : '2' %>">
+                    <strong>R$ <%= number_to_currency(@review.review_parts.sum(&:subtotal), unit: "", precision: 2) %></strong>
+                  </td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        <% else %>
+          <p class="text-muted">Nenhuma peça adicionada ainda.</p>
+        <% end %>
+      </div>
+    </div>
+    
+    <!-- Ações de navegação e conclusão -->
+    <div class="card">
+      <div class="card-body">
+        <%= link_to "Voltar", mechanic_reviews_path, class: "btn btn-secondary" %>
+        
+        <% if @review.status == 'em_andamento' %>
+          <%= button_to "Finalizar Revisão", finalizar_mechanic_review_path(@review),
+              method: :patch,
+              data: { confirm: "Tem certeza que deseja finalizar esta revisão?" },
+              class: "btn btn-success" %>
+        <% end %>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Coluna lateral: resumo financeiro e peças recomendadas -->
+  <div class="col-md-4">
+    <!-- Resumo financeiro -->
+    <div class="card mb-3">
+      <div class="card-header bg-primary text-white">
+        <h5 class="mb-0">💰 Resumo Financeiro</h5>
+      </div>
+      <div class="card-body">
+        <div class="d-flex justify-content-between mb-2">
+          <span>Peças:</span>
+          <strong>R$ <%= number_to_currency(@review.review_parts.sum(&:subtotal), unit: "", precision: 2) %></strong>
+        </div>
+        
+        <div class="d-flex justify-content-between mb-2">
+          <span>Mão de Obra:</span>
+          <strong>
+            <% if @review.service_type == 'garantia' %>
+              <span class="text-success">Gratuita</span>
+            <% else %>
+              R$ <%= number_to_currency(@review.labor_value, unit: "", precision: 2) %>
+            <% end %>
+          </strong>
+        </div>
+        
+        <hr>
+        
+        <div class="d-flex justify-content-between">
+          <strong>TOTAL:</strong>
+          <strong class="text-primary fs-5">
+            R$ <%= number_to_currency(@review.total_value, unit: "", precision: 2) %>
+          </strong>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Peças recomendadas -->
+    <div class="card">
+      <div class="card-header">
+        <h5>🔧 Peças Recomendadas</h5>
+      </div>
+      <div class="card-body">
+        <% pecas_modelo = @review.motorcycle.motorcycle_model.parts %>
+        <% if pecas_modelo.any? %>
+          <p class="small"><strong>Peças deste modelo:</strong></p>
+          <ul class="small">
+            <% pecas_modelo.limit(10).each do |peca| %>
+              <li>
+                <%= peca.name %>
+                <% mp = @review.motorcycle.motorcycle_model.model_parts.find_by(part: peca) %>
+                <% if mp&.mandatory_review %>
+                  <span class="badge bg-warning text-dark">Obrigatória</span>
+                <% end %>
+                <br>
+                <small class="text-muted">
+                  <%= peca.original_code %> - 
+                  R$ <%= number_to_currency(peca.unit_price, unit: "", precision: 2) %>
+                  <% if peca.stock > 0 %>
+                    <span class="badge bg-success">Em estoque: <%= peca.stock %></span>
+                  <% else %>
+                    <span class="badge bg-danger">Sem estoque</span>
+                  <% end %>
+                </small>
+              </li>
+            <% end %>
+          </ul>
+        <% else %>
+          <p class="text-muted small">Nenhuma peça específica cadastrada.</p>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal para adicionar nova peça -->
+<div class="modal fade" id="addPecaModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <%= form_with(url: mechanic_review_review_parts_path(@review), local: true) do |form| %>
+        <div class="modal-header">
+          <h5 class="modal-title">Adicionar Peça à Revisão</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <!-- Seleção da peça -->
+          <div class="mb-3">
+            <%= label_tag :part_id, "Peça", class: "form-label" %>
+            <%= select_tag :part_id, 
+                options_from_collection_for_select(@available_parts, :id, :name),
+                { class: "form-select", id: "part_select" } %>
+            <div class="form-text" id="part_info"></div>
+          </div>
+          
+          <!-- Quantidade -->
+          <div class="mb-3">
+            <%= label_tag :quantity, "Quantidade", class: "form-label" %>
+            <%= number_field_tag :quantity, 1, class: "form-control", min: 1, required: true %>
+          </div>
+          
+          <!-- Valor unitário -->
+          <div class="mb-3">
+            <%= label_tag :unit_price, "Preço Unitário (R$)", class: "form-label" %>
+            <%= number_field_tag :unit_price, nil, class: "form-control", step: 0.01, min: 0, 
+                placeholder: "Será preenchido automaticamente", id: "unit_price_field" %>
+          </div>
+          
+          <!-- Garantia -->
+          <div class="mb-3">
+            <div class="form-check">
+              <%= check_box_tag :guarantee, "1", @review.service_type == 'garantia', class: "form-check-input" %>
+              <%= label_tag :guarantee, "Coberto pela garantia?", class: "form-check-label" %>
+            </div>
+            <% if @review.service_type == 'garantia' %>
+              <div class="form-text text-success">
+                ✓ Esta é uma revisão de garantia
+              </div>
+            <% end %>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <%= submit_tag "Adicionar Peça", class: "btn btn-primary" %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>
+
+<!-- Script para preencher automaticamente o preço da peça -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const partSelect = document.getElementById('part_select');
+  const priceField = document.getElementById('unit_price_field');
+  const partInfo = document.getElementById('part_info');
+  
+  const partsData = <%= raw @available_parts.to_json(only: [:id, :unit_price, :stock, :original_code]) %>;
+  
+  if (partSelect) {
+    partSelect.addEventListener('change', function() {
+      const partId = parseInt(this.value);
+      const part = partsData.find(p => p.id === partId);
+      
+      if (part) {
+        priceField.value = part.unit_price;
+        partInfo.innerHTML = `Código: ${part.original_code} | Estoque: ${part.stock} unidades`;
+      }
+    });
+  }
+});
+</script>
