@@ -1,2 +1,136 @@
-<h1>Mechanic::Reviews#edit</h1>
-<p>Find me in app/views/mechanic/reviews/edit.html.erb</p>
+<%# == View: mechanic/reviews/edit.html.erb %>
+<%# Página para o mecânico editar uma revisão existente. Exibe formulário de atualização e informações da moto e da revisão. %>
+
+<h1>Editar Revisão #<%= @review.id %></h1>
+
+<div class="row">
+  <div class="col-md-8">
+    <!-- Card principal com formulário de edição da revisão -->
+    <div class="card">
+      <div class="card-body">
+        <%= form_with(model: [:mechanic, @review], local: true) do |form| %>
+          
+          <%# Exibe mensagens de erro do modelo @review, se existirem %>
+          <% if @review.errors.any? %>
+            <!-- Alerta de erros de validação -->
+            <div class="alert alert-danger">
+              <h5><%= pluralize(@review.errors.count, "erro") %> impediram a atualização:</h5>
+              <ul class="mb-0">
+                <% @review.errors.full_messages.each do |message| %>
+                  <li><%= message %></li>
+                <% end %>
+              </ul>
+            </div>
+          <% end %>
+
+          <!-- Campo: KM Atual da Moto -->
+          <div class="mb-3">
+            <%= form.label :km_review, "KM Atual da Moto", class: "form-label" %>
+            <%= form.number_field :km_review, class: "form-control", min: 0 %>
+          </div>
+
+          <!-- Campo: Status da Revisão -->
+          <div class="mb-3">
+            <%= form.label :status, "Status", class: "form-label" %>
+            <%= form.select :status,
+                options_for_select([
+                  ['Em Andamento', 'em_andamento'],
+                  ['Aguardando Peça', 'aguardando_peca']
+                ], @review.status),
+                {},
+                { class: "form-select" } %>
+          </div>
+
+          <!-- Campo: Valor da Mão de Obra -->
+          <div class="mb-3">
+            <%= form.label :labor_value, "Valor da Mão de Obra (R$)", class: "form-label" %>
+            <%= form.number_field :labor_value, class: "form-control", step: 0.01, min: 0 %>
+            
+            <%# Exibe nota informativa quando a revisão for de garantia %>
+            <% if @review.service_type == 'garantia' %>
+              <!-- Informação de gratuidade da mão de obra -->
+              <div class="form-text text-success">
+                Mão de obra gratuita em revisões de garantia
+              </div>
+            <% end %>
+          </div>
+
+          <!-- Campo: Observações visíveis ao cliente -->
+          <div class="mb-3">
+            <%= form.label :mechanic_observations, "Observações (visível ao cliente)", class: "form-label" %>
+            <%= form.text_area :mechanic_observations, 
+                class: "form-control",
+                rows: 3,
+                placeholder: "Descreva o serviço realizado, problemas encontrados..." %>
+          </div>
+
+          <!-- Campo: Observações internas (não visível ao cliente) -->
+          <div class="mb-3">
+            <%= form.label :internal_observations, "Observações Internas (não visível ao cliente)", class: "form-label" %>
+            <%= form.text_area :internal_observations, 
+                class: "form-control",
+                rows: 2,
+                placeholder: "Anotações internas, pendências..." %>
+          </div>
+
+          <%# Campo de laudo técnico, apenas para revisões de garantia %>
+          <% if @review.service_type == 'garantia' %>
+            <!-- Campo: Laudo técnico da revisão de garantia -->
+            <div class="mb-3">
+              <%= form.label :report, "Laudo da Revisão de Garantia", class: "form-label" %>
+              <%= form.text_area :report, 
+                  class: "form-control",
+                  rows: 4,
+                  placeholder: "Laudo técnico detalhado para garantia..." %>
+            </div>
+          <% end %>
+
+          <!-- Botões de ação -->
+          <div class="mt-4">
+            <%= form.submit "Atualizar Revisão", class: "btn btn-primary" %>
+            <%= link_to "Cancelar", mechanic_review_path(@review), class: "btn btn-secondary" %>
+          </div>
+
+        <% end %>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Coluna lateral com informações da moto e resumo da revisão -->
+  <div class="col-md-4">
+    <!-- Card: informações básicas da moto -->
+    <div class="card">
+      <div class="card-header">
+        <h5>Informações da Moto</h5>
+      </div>
+      <div class="card-body">
+        <h6><%= @review.motorcycle.motorcycle_model.name %></h6>
+        <p>
+          <strong>Cliente:</strong> <%= @review.motorcycle.user.name %><br>
+          <strong>Placa:</strong> <%= @review.motorcycle.license_plate %><br>
+          <strong>Ano:</strong> <%= @review.motorcycle.year_of_manufacture %>
+        </p>
+      </div>
+    </div>
+    
+    <!-- Card: resumo geral da revisão -->
+    <div class="card mt-3">
+      <div class="card-header">
+        <h5>Resumo da Revisão</h5>
+      </div>
+      <div class="card-body">
+        <p>
+          <strong>Iniciada em:</strong><br>
+          <%= l(@review.start_date, format: :short) %>
+        </p>
+        <p>
+          <strong>Peças Adicionadas:</strong> <%= @review.review_parts.count %>
+        </p>
+        <p>
+          <strong>Valor Atual:</strong><br>
+          R$ <%= number_to_currency(@review.total_value, unit: "", precision: 2) %>
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
