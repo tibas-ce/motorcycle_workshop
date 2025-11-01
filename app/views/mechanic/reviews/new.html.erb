@@ -1,2 +1,155 @@
-<h1>Mechanic::Reviews#new</h1>
-<p>Find me in app/views/mechanic/reviews/new.html.erb</p>
+<%# == View: mechanic/reviews/new.html.erb %>
+<%# Página para iniciar uma nova revisão pelo mecânico. Exibe informações do agendamento (quando presente), formulário de início da revisão e painel lateral com dados da moto e observações do cliente. %>
+
+<h1>Iniciar Nova Revisão</h1>
+
+<%# Exibe informações do agendamento, se existir %>
+<% if @scheduling %>
+  <!-- Caixa de alerta com resumo do agendamento -->
+  <div class="alert alert-info">
+    <strong>Agendamento:</strong> <%= l(@scheduling.scheduled_time_date, format: :long) %><br>
+    <strong>Cliente:</strong> <%= @scheduling.user.name %><br>
+    <strong>Moto:</strong> <%= @scheduling.motorcycle.motorcycle_model.name %> - <%= @scheduling.motorcycle.license_plate %>
+  </div>
+<% end %>
+
+<div class="row">
+  <div class="col-md-8">
+    <!-- Card principal com o formulário para iniciar a revisão -->
+    <div class="card">
+      <div class="card-body">
+        <%= form_with(model: [:mechanic, @review], local: true) do |form| %>
+          <%= hidden_field_tag :scheduling_id, @scheduling&.id %>
+
+          <%# Exibe mensagens de erro do modelo @review, se houver %>
+          <% if @review.errors.any? %>
+            <!-- Alert de erros de validação -->
+            <div class="alert alert-danger">
+              <h5><%= pluralize(@review.errors.count, "erro") %> impediram o início da revisão:</h5>
+              <ul class="mb-0">
+                <% @review.errors.full_messages.each do |message| %>
+                  <li><%= message %></li>
+                <% end %>
+              </ul>
+            </div>
+          <% end %>
+
+          <!-- Campo: Data e hora de início -->
+          <div class="mb-3">
+            <%= form.label :start_date, "Data e Hora de Início", class: "form-label" %>
+            <%= form.datetime_local_field :start_date,
+                  class: "form-control",
+                  value: Time.current.strftime("%Y-%m-%dT%H:%M") %>
+          </div>
+
+          <!-- Campo: KM atual registrado na revisão -->
+          <div class="mb-3">
+            <%= form.label :km_review, "KM Atual da Moto", class: "form-label" %>
+            <%= form.number_field :km_review,
+                  class: "form-control",
+                  min: 0,
+                  value: @scheduling&.current_km_scheduling %>
+          </div>
+
+          <!-- Campo: Valor da mão de obra -->
+          <div class="mb-3">
+            <%= form.label :labor_value, "Valor da Mão de Obra (R$)", class: "form-label" %>
+            <%= form.number_field :labor_value,
+                  class: "form-control",
+                  step: 0.01,
+                  min: 0,
+                  value: @review.service_type == 'garantia' ? 0 : nil %>
+            <%# Mensagem contextual quando for revisão de garantia %>
+            <% if @review.service_type == 'garantia' %>
+              <!-- Indica que a mão de obra é gratuita para revisões de garantia -->
+              <div class="form-text text-success">
+                Mão de obra gratuita em revisões de garantia
+              </div>
+            <% end %>
+          </div>
+
+          <!-- Campo: Observações visíveis ao cliente -->
+          <div class="mb-3">
+            <%= form.label :mechanic_observations, "Observações (visível ao cliente)", class: "form-label" %>
+            <%= form.text_area :mechanic_observations,
+                  class: "form-control",
+                  rows: 3,
+                  placeholder: "Descreva o serviço realizado, problemas encontrados..." %>
+          </div>
+
+          <!-- Campo: Observações internas (não visível ao cliente) -->
+          <div class="mb-3">
+            <%= form.label :internal_observations, "Observações Internas (não visível ao cliente)", class: "form-label" %>
+            <%= form.text_area :internal_observations,
+                  class: "form-control",
+                  rows: 2,
+                  placeholder: "Anotações internas, pendências..." %>
+          </div>
+
+          <%# Campo de laudo, exibido apenas quando a revisão é de garantia %>
+          <% if @review.service_type == 'garantia' %>
+            <!-- Campo: Laudo técnico para revisões de garantia -->
+            <div class="mb-3">
+              <%= form.label :report, "Laudo da Revisão de Garantia", class: "form-label" %>
+              <%= form.text_area :report,
+                    class: "form-control",
+                    rows: 4,
+                    placeholder: "Laudo técnico detalhado para garantia..." %>
+            </div>
+          <% end %>
+
+          <!-- Botões de ação -->
+          <div class="mt-4">
+            <%= form.submit "Iniciar Revisão", class: "btn btn-success" %>
+            <%= link_to "Cancelar", mechanic_schedulings_path, class: "btn btn-secondary" %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+
+  <!-- Painel lateral com informações da moto e observações do cliente -->
+  <div class="col-md-4">
+    <% if @scheduling %>
+      <!-- Card: informações da motocicleta vinculada ao agendamento -->
+      <div class="card">
+        <div class="card-header">
+          <h5>Informações da Moto</h5>
+        </div>
+        <div class="card-body">
+          <h6><%= @scheduling.motorcycle.motorcycle_model.name %></h6>
+          <p>
+            <strong>Placa:</strong> <%= @scheduling.motorcycle.license_plate %><br>
+            <strong>Ano:</strong> <%= @scheduling.motorcycle.start_production_year %><br>
+            <strong>Cor:</strong> <%= @scheduling.motorcycle.color %><br>
+            <strong>KM Atual:</strong> <%= number_with_delimiter(@scheduling.motorcycle.current_km) %> km
+          </p>
+
+          <hr>
+
+          <%# Indica se a moto ainda está em garantia e mostra info %>
+          <% if @scheduling.motorcycle.under_warranty? %>
+            <!-- Badge: em garantia -->
+            <span class="badge bg-success">Em Garantia</span><br>
+            <small class="text-muted"><%= @scheduling.motorcycle.info_guarantee %></small>
+          <% else %>
+            <!-- Badge: fora da garantia -->
+            <span class="badge bg-secondary">Fora da Garantia</span>
+          <% end %>
+        </div>
+      </div>
+
+      <%# Se o cliente deixou observações no agendamento, exibe em card separado %>
+      <% if @scheduling.client_observations.present? %>
+        <div class="card mt-3">
+          <div class="card-header">
+            <h5>Observações do Cliente</h5>
+          </div>
+          <div class="card-body">
+            <%= simple_format(@scheduling.client_observations) %>
+          </div>
+        </div>
+      <% end %>
+    <% end %>
+  </div>
+</div>
